@@ -10,6 +10,9 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 
 - **disk-analyzer**:
 
+> has color values for 'above 50%', 'below 50%', and 'below threshhold' <- the
+> threshhold is configurable via a VARIABLE
+
 ![disk-analyzer](assets/disk-analyzer.png)
 
 - **git-status**:
@@ -17,6 +20,9 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 ![git-status](assets/git-status.png)
 
 - **docker-status** (ssh):
+
+> note that the `hostname` gets also displayed along the `username`, when connecting
+> via **ssh**
 
 ![docker-showcase-up-one](assets/docker-showcase-up.png)
 
