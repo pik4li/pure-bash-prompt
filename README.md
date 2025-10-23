@@ -1,15 +1,32 @@
-# pure prompt for bash
-pure, the minimal prompt for bash
+# a pure bash prompt
 
-Inspired by [sindresorhus/pure](https://github.com/sindresorhus/pure)
+Pure bash prompt with git integration, docker compose project detection and
+diskspace analyzer direcly in pure bash
 
-![Shell Images](image.png "Shell Images")
+Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pure-prompt-bash)
+
+<details>
+<summary>Preview</summary>
+
+**disk-analyzer**:
+![disk-analyzer](assets/disk-analyzer.png)
+
+**git-status**:
+![git-status](assets/git-status.png)
+
+**docker-status** (ssh):
+![docker-showcase-up-one](assets/docker-showcase-up.png)
+![docker-showcase-up-more](assets/docker-showcase-up-more.png)
+
+</details>
 
 ## Install
 
 just clone this repository (or just copy pure.bash) anywhere, and add
 
-    source /path/to/pure.bash
+```bash
+source /path/to/pure.bash
+```
 
 to your `.bashrc`
 
