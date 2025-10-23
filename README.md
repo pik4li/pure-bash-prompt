@@ -8,14 +8,18 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 <details>
 <summary>Preview</summary>
 
-**disk-analyzer**:
+- **disk-analyzer**:
+
 ![disk-analyzer](assets/disk-analyzer.png)
 
-**git-status**:
+- **git-status**:
+
 ![git-status](assets/git-status.png)
 
-**docker-status** (ssh):
+- **docker-status** (ssh):
+
 ![docker-showcase-up-one](assets/docker-showcase-up.png)
+
 ![docker-showcase-up-more](assets/docker-showcase-up-more.png)
 
 </details>
