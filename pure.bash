@@ -13,9 +13,11 @@ FIRST_LINE=""
 SECOND_LINE=""
 PROMPT_COMMAND=""
 
-ENABLE_DISKSPACE=true   # set to false to disable diskspace
-DISK_THRESHHOLD=24      # how much GB is set to be "low" -> red/orange colored
-DOCKER_STRIP_NAME=false # set this to true, to strip the name when it is too long
+ENABLE_DISKSPACE=true      # set to false to disable diskspace
+ENABLE_DOCKER_DISPLAY=true # set to false to disable docker compose project detection and display
+ENABLE_GIT_DISPLAY=true    # set to false to disable git status
+DISK_THRESHHOLD=24         # how much GB is considered to be "low" -> red/orange colored
+DOCKER_STRIP_NAME=false    # set this to true, to strip the name when it is too long
 
 command-exists() {
   command -v "$@" >/dev/null 2>&1
@@ -23,17 +25,19 @@ command-exists() {
 
 __pure_diskspace_async=true # set to false to disable async fetch for diskspace
 diskspace() {
-  local space avail
+  local space avail unit
   space=$(df -h . | tail -1 | awk '{print $4}')
   avail=$(df -h . | tail -1 | awk '{print $2}')
 
   avail=${avail%*G}
   avail=${avail%*T}
 
+  unit=${space: -1}
+
   # displays the threshold in colors
-  if ((${space%*G} > avail / 2)); then
+  if ((${space%*"${unit}"} > avail / 2)); then
     printf "${BRIGHT_GREEN}%s${RESET}" "$space"
-  elif ((${space%*G} > DISK_THRESHHOLD)); then
+  elif ((${space%*"${unit}"} > DISK_THRESHHOLD)); then
     printf "${BRIGHT_YELLOW}%s${RESET}" "$space"
   else
     printf "${BRIGHT_RED}%s${RESET}" "$space"
@@ -216,8 +220,9 @@ __pure_update_prompt_color() {
   if ${__pure_diskspace_async}; then
     DISK_SPACE=$(diskspace &)
   else
-    DISK_SPACE=$(diskspace)
+    DISK_SPACE=$(diskspace 2>/dev/null)
   fi
+
   SPACING=$(create-spacer)
 }
 
@@ -298,21 +303,25 @@ esac
 
 # if git isn't installed when shell launches, git integration isn't activated -
 # same for docker
-if command-exists git; then
-  # PROMPT_COMMAND+="; __pure_update_prompt_color"
-  PROMPT_COMMAND="__pure_update_git_status; ${PROMPT_COMMAND}"
+if $ENABLE_GIT_DISPLAY; then
+  if command-exists git; then
+    # PROMPT_COMMAND+="; __pure_update_prompt_color"
+    PROMPT_COMMAND="__pure_update_git_status; ${PROMPT_COMMAND}"
+  fi
 fi
 
-DOCKER_LINE=""
+if $ENABLE_DOCKER_DISPLAY; then
+  DOCKER_LINE=""
 
-if command-exists docker; then
-  PROMPT_COMMAND="__pure_update_compose_status; ${PROMPT_COMMAND}"
-  DOCKER_LINE="\${pure_compose_status}\n"
+  if command-exists docker; then
+    PROMPT_COMMAND="__pure_update_compose_status; ${PROMPT_COMMAND}"
+    DOCKER_LINE="\${pure_compose_status}\n"
+  fi
 fi
 
 PROMPT_COMMAND="__pure_update_prompt_color; ${PROMPT_COMMAND}"
 
-: "${SPACING:=$(create-spacer)}"
+# : "${SPACING:=$(create-spacer)}"
 
 if $ENABLE_DISKSPACE; then
   # FIRST_LINE="${USER_HOST}${CYAN}\w ${BRA_LEFT}\${DISK_SPACE}${BRA_RIGHT}\${SPACING}${MAGENTA}\${pure_git_status}\n"
