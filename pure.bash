@@ -23,24 +23,44 @@ command-exists() {
   command -v "$@" >/dev/null 2>&1
 }
 
+get-icon() {
+  local arg=$1 bar
+
+  if command-exists spark; then
+    bar=$(spark $arg,100)
+    bar=${bar:0:1}
+
+    printf "%s " "$bar"
+  fi
+}
+
 __pure_diskspace_async=true # set to false to disable async fetch for diskspace
 diskspace() {
-  local space avail unit
-  space=$(df -h . | tail -1 | awk '{print $4}')
-  avail=$(df -h . | tail -1 | awk '{print $2}')
+  local space avail unit icon perc data
+  data=($(df -h . | tail -1))
+
+  space=${data[3]}
+  avail=${data[1]}
+  perc=${data[4]}
+
+  # space=$(df -h . | tail -1 | awk '{print $4}')
+  # avail=$(df -h . | tail -1 | awk '{print $2}')
+  # perc=$(df -h . | tail -1 | awk '{print $5}')
+  perc=${perc%\%}
 
   avail=${avail%*G}
   avail=${avail%*T}
-
   unit=${space: -1}
+
+  icon=$(get-icon "${perc}")
 
   # displays the threshold in colors
   if ((${space%*"${unit}"} > avail / 2)); then
-    printf "${BRIGHT_GREEN}%s${RESET}" "$space"
+    printf "${BRIGHT_GREEN}${icon:-}%s${RESET}" "$space"
   elif ((${space%*"${unit}"} > DISK_THRESHHOLD)); then
-    printf "${BRIGHT_YELLOW}%s${RESET}" "$space"
+    printf "${BRIGHT_YELLOW}${icon:-}%s${RESET}" "$space"
   else
-    printf "${BRIGHT_RED}%s${RESET}" "$space"
+    printf "${BRIGHT_RED}${icon:-}%s${RESET}" "$space"
   fi
 }
 
@@ -129,17 +149,16 @@ pure_git_async_update=true
 pure_git_raw_remote_status="+0 -0"
 
 __pure_echo_git_remote_status() {
-
   # get unpulled & unpushed status
-  if ${pure_git_async_update}; then
-    # do async
-    # FIXME: this async execution doesn't change pure_git_raw_remote_status. so remote status never changes in async mode
-    # FIXME: async mode takes as long as sync mode
-    pure_git_raw_remote_status=$(git status --porcelain=2 --branch | command grep --only-matching --perl-regexp '\+\d+ \-\d+') &
-  else
-    # do sync
-    pure_git_raw_remote_status=$(git status --porcelain=2 --branch | command grep --only-matching --perl-regexp '\+\d+ \-\d+')
-  fi
+  # if ${pure_git_async_update}; then
+  # do async
+  # FIXME: this async execution doesn't change pure_git_raw_remote_status. so remote status never changes in async mode
+  # FIXME: async mode takes as long as sync mode
+  # pure_git_raw_remote_status=$(git status --porcelain=2 --branch | command grep --only-matching --perl-regexp '\+\d+ \-\d+') &
+  # else
+  # do sync
+  pure_git_raw_remote_status=$(git status --porcelain=2 --branch | command grep --only-matching --perl-regexp '\+\d+ \-\d+')
+  # fi
 
   # shape raw status and check unpulled commit
   local readonly UNPULLED=$(echo ${pure_git_raw_remote_status} | command grep --only-matching --perl-regexp '\-\d')
