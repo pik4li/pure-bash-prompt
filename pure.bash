@@ -25,13 +25,11 @@ command-exists() {
 
 get-icon() {
   local arg=$1 bar
+  local ticks=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
 
-  if command-exists spark; then
-    bar=$(spark $arg,100)
-    bar=${bar:0:1}
+  arg=$((arg * ${#ticks[@]} / 100))
 
-    printf "%s " "$bar"
-  fi
+  printf "%s " "${ticks[$arg]}"
 }
 
 __pure_diskspace_async=true # set to false to disable async fetch for diskspace
