@@ -293,10 +293,26 @@ __get_docker_container__() {
 __get_uptime__() {
   local ut=$(uptime -p)
 
-  if $ENABLE_NERDFONTS; then
-    ut=${ut/up /"${BOLD}${GRAY}󰔛 ${NC}"}
+  if grep -qi "year" <<<"${ut}"; then
+    UPTIME_COLOR=${MAGENTA}
+  elif grep -qi "months" <<<"${ut}"; then
+    UPTIME_COLOR=${BLUE}
+  elif grep -qi "week" <<<"${ut}"; then
+    UPTIME_COLOR=${CYAN}
+  elif grep -qi "day" <<<"${ut}"; then
+    UPTIME_COLOR=${RED}
+  elif grep -qi "hour" <<<"${ut}"; then
+    UPTIME_COLOR=${ORANGE}
+  elif grep -qi "minute" <<<"${ut}"; then
+    UPTIME_COLOR=${YELLOW}
   else
-    ut=${ut/up /"${BOLD}${GRAY}up${NC}"}
+    UPTIME_COLOR=${GRAY}
+  fi
+
+  if $ENABLE_NERDFONTS; then
+    ut=${ut/up /"${BOLD}${UPTIME_COLOR}󰔛 ${NC}"}
+  else
+    ut=${ut/up /"${BOLD}${UPTIME_COLOR}up${NC}"}
   fi
 
   # redraw minutes
@@ -311,9 +327,17 @@ __get_uptime__() {
   ut=${ut/ days\,/"${BOLD}${RED}d,${NC}"}
   ut=${ut/ day\,/"${BOLD}${RED}d,${NC}"}
 
+  # redraw weeks
+  ut=${ut/ weeks\,/"${BOLD}${CYAN}W,${NC}"}
+  ut=${ut/ week\,/"${BOLD}${CYAN}W,${NC}"}
+
+  # redraw months
+  ut=${ut/ months\,/"${BOLD}${BLUE}M,${NC}"}
+  ut=${ut/ month\,/"${BOLD}${BLUE}M,${NC}"}
+
   # redraw years
-  ut=${ut/ years\,/"${BOLD}${MAGENTA}y,${NC}"}
-  ut=${ut/ year\,/"${BOLD}${MAGENTA}y,${NC}"}
+  ut=${ut/ years\,/"${BOLD}${MAGENTA}Y,${NC}"}
+  ut=${ut/ year\,/"${BOLD}${MAGENTA}Y,${NC}"}
 
   # $ut exists, or return nothing
   [[ -n "${ut}" ]] || return
