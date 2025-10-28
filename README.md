@@ -63,4 +63,4 @@ just remove what you downloaded, and delete `source` command from your `.bashrc`
 
 ## License
 
-MIT License. See LICENSE.
+MIT License. See [LICENSE](./LICENSE).
