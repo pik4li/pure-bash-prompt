@@ -7,7 +7,7 @@ ENABLE_GIT=true       # set to `false` to disable GIT module
 ENABLE_SSH=true       # set to `false` to disable SSH module
 ENABLE_DOCKER=true    # set to `false` to disable DOCKER module
 ENABLE_DISKSPACE=true # set to `false` to disable DISKSPACE module
-ENABLE_UPTIME=false   # set to `true` to enable UPTIME module
+ENABLE_UPTIME=true    # set to `true` to enable UPTIME module
 
 DOCKER_SANITIZE_NAME=false
 
@@ -294,7 +294,7 @@ __get_uptime__() {
   local ut=$(uptime -p)
 
   # replace all ", " with "," so that the space will get more tighter
-  ut=${ut//, /,}
+  ut=${ut//, /" "}
 
   if grep -qi "year" <<<"${ut}"; then
     UPTIME_COLOR=${MAGENTA}
@@ -324,24 +324,24 @@ __get_uptime__() {
   ut=${ut/ minute/"${BOLD}${YELLOW}m${NC}"}
 
   # redraw hours
-  ut=${ut/ hours\,/"${BOLD}${ORANGE}h,${NC}"}
-  ut=${ut/ hour\,/"${BOLD}${ORANGE}h,${NC}"}
+  ut=${ut/ hours/"${BOLD}${ORANGE}h${NC}"}
+  ut=${ut/ hour/"${BOLD}${ORANGE}h${NC}"}
 
   # redraw days
-  ut=${ut/ days\,/"${BOLD}${RED}d,${NC}"}
-  ut=${ut/ day\,/"${BOLD}${RED}d,${NC}"}
+  ut=${ut/ days/"${BOLD}${RED}d${NC}"}
+  ut=${ut/ day/"${BOLD}${RED}d${NC}"}
 
   # redraw weeks
-  ut=${ut/ weeks\,/"${BOLD}${CYAN}W,${NC}"}
-  ut=${ut/ week\,/"${BOLD}${CYAN}W,${NC}"}
+  ut=${ut/ weeks/"${BOLD}${CYAN}W${NC}"}
+  ut=${ut/ week/"${BOLD}${CYAN}W${NC}"}
 
   # redraw months
-  ut=${ut/ months\,/"${BOLD}${BLUE}M,${NC}"}
-  ut=${ut/ month\,/"${BOLD}${BLUE}M,${NC}"}
+  ut=${ut/ months/"${BOLD}${BLUE}M${NC}"}
+  ut=${ut/ month/"${BOLD}${BLUE}M${NC}"}
 
   # redraw years
-  ut=${ut/ years\,/"${BOLD}${MAGENTA}Y,${NC}"}
-  ut=${ut/ year\,/"${BOLD}${MAGENTA}Y,${NC}"}
+  ut=${ut/ years/"${BOLD}${MAGENTA}Y${NC}"}
+  ut=${ut/ year/"${BOLD}${MAGENTA}Y${NC}"}
 
   # $ut exists, or return nothing
   [[ -n "${ut}" ]] || return
