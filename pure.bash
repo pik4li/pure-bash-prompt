@@ -293,6 +293,9 @@ __get_docker_container__() {
 __get_uptime__() {
   local ut=$(uptime -p)
 
+  # replace all ", " with "," so that the space will get more tighter
+  ut=${ut//, /,}
+
   if grep -qi "year" <<<"${ut}"; then
     UPTIME_COLOR=${MAGENTA}
   elif grep -qi "months" <<<"${ut}"; then
@@ -315,6 +318,7 @@ __get_uptime__() {
     ut=${ut/up/"${BOLD}${UPTIME_COLOR}up${NC}"}
   fi
 
+  # ─< replace the fullname with colored symbols >────────────────────────────────
   # redraw minutes
   ut=${ut/ minutes/"${BOLD}${YELLOW}m${NC}"}
   ut=${ut/ minute/"${BOLD}${YELLOW}m${NC}"}
