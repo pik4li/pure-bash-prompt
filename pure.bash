@@ -124,8 +124,17 @@ __get_git_status__() {
 
     git_status="$(git branch --show-current)"
 
+    local gitdiff diff
+    gitdiff=$(git diff --quiet)
+
+    if [[ -n "${gitdiff}" ]]; then
+      diff="$pure_symbol_dirty"
+    else
+      diff=""
+    fi
+
     # check clean/dirty
-    git_status="${git_status}$(git diff --quiet || echo "${pure_symbol_dirty}")"
+    git_status="${git_status}${diff}"
 
     # coloring
     git_status="${GRAY}${git_status}${NC}"
