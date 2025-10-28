@@ -1,4 +1,6 @@
-## Settings
+# ╭────────────╮
+# │  Settings  │
+# ╰────────────╯
 ENABLE_GIT=true
 ENABLE_SSH=true
 ENABLE_DOCKER=true
@@ -14,7 +16,8 @@ BLUE=$'\e[34m'
 MAGENTA=$'\e[35m'
 CYAN=$'\e[36m'
 WHITE=$'\e[37m'
-GRAY=$(tput setaf 8)
+
+GRAY=$'\e[38;5;239m'
 
 # Styles
 BOLD=$'\e[1m'
@@ -28,6 +31,10 @@ NC=$'\e[0m' # Reset all styles/colors
 
 BRA_LEFT="${BOLD}${GRAY}[${NC}"
 BRA_RIGHT="${BOLD}${GRAY}]${NC}"
+
+command-exists() {
+  command -v "$@" >/dev/null 2>&1
+}
 
 get-icon() {
   local arg=$1 bar
@@ -47,9 +54,6 @@ __get_diskspace__() {
   avail=${data[1]}
   perc=${data[4]}
 
-  # space=$(df -h . | tail -1 | awk '{print $4}')
-  # avail=$(df -h . | tail -1 | awk '{print $2}')
-  # perc=$(df -h . | tail -1 | awk '{print $5}')
   perc=${perc%\%}
 
   avail=${avail%*G}
@@ -224,13 +228,13 @@ __get_docker_container__() {
       # if [[ $(docker compose -f "$compose_file" ps --status running --services 2>/dev/null | wc -l) -gt 0 ]]; then
       for service in "${docker_compose_services[@]}"; do
         service=$(sanitize-project-name "${service}")
-        temp_compose_status+="${BRA_LEFT}${BLUE}${service} ${GREEN}(up)${BRA_RIGHT}${RESET} " # keep the space to space out the projects
+        temp_compose_status+="${BRA_LEFT}${BLUE}${service} ${BOLD}${GREEN}(up)${BRA_RIGHT}${RESET} " # keep the space to space out the projects
       done
 
       [[ -n "${temp_compose_status}" ]] &&
         pure_compose_status=${temp_compose_status}
     else
-      pure_compose_status="${BRA_LEFT}${BLUE}${project_name} ${RED}(down)${BRA_RIGHT}${RESET}"
+      pure_compose_status="${BRA_LEFT}${BOLD}${RED}${project_name} ${RED}(down)${BRA_RIGHT}${RESET}"
     fi
     # else
     #   pure_compose_status="${YELLOW}${project_name}(?)${RESET}"
@@ -307,4 +311,11 @@ PROMPT_COMMAND="__update__vars; ${PROMPT_COMMAND}"
 
 # This ensures the docker line is set if a composefile was found. Otherwise does
 # NOT generate an empty line above
-PS1="\${INFO_LINE}\n${PROMPT_SYMBOL}"
+PS1="\n\${INFO_LINE}\n${PROMPT_SYMBOL}"
+
+if command-exists zoxide; then
+  eval "$(zoxide init bash)"
+  alias zz="zoxide query --interactive"
+fi
+alias ..="cd .."
+. "$HOME/.bashenv"
