@@ -126,6 +126,9 @@ __get_git_status__() {
 
     git_status="$(git branch --show-current)"
 
+    # if no branch was found, then use HEAD
+    [[ -n "${git_status}" ]] || git_status="HEAD"
+
     git diff --quiet &>/dev/null
 
     local err=$?
