@@ -1,27 +1,33 @@
-#!/usr/bin/env bash
+## Settings
+ENABLE_GIT=true
+ENABLE_SSH=true
+ENABLE_DOCKER=true
+ENABLE_DISKSPACE=true
+DOCKER_SANITIZE_NAME=false
 
-# INFO:
-# ╭─────────────────────────────────────────────────────────╮
-# │ pure prompt on bash                                     │
-# │ extended with git/docker(-compose)/filesize information │
-# │                                                         │
-# │ Author: Alexander Pieck (pika)                          │
-# ╰─────────────────────────────────────────────────────────╯
-ENABLE_SSH=false
+# Basic Colors
+BLACK=$'\e[30m'
+RED=$'\e[31m'
+GREEN=$'\e[32m'
+YELLOW=$'\e[33m'
+BLUE=$'\e[34m'
+MAGENTA=$'\e[35m'
+CYAN=$'\e[36m'
+WHITE=$'\e[37m'
+GRAY=$(tput setaf 8)
 
-FIRST_LINE=""
-SECOND_LINE=""
-PROMPT_COMMAND=""
+# Styles
+BOLD=$'\e[1m'
+ITALIC=$'\e[3m'
+UNDERLINE=$'\e[4m'
+BLINK=$'\e[5m'  # May not work in all terminals
+INVERT=$'\e[7m' # Invert foreground/background
+STRIKE=$'\e[9m' # Strikethrough
 
-ENABLE_DISKSPACE=true      # set to false to disable diskspace
-ENABLE_DOCKER_DISPLAY=true # set to false to disable docker compose project detection and display
-ENABLE_GIT_DISPLAY=true    # set to false to disable git status
-DISK_THRESHHOLD=24         # how much GB is considered to be "low" -> red/orange colored
-DOCKER_STRIP_NAME=false    # set this to true, to strip the name when it is too long
+NC=$'\e[0m' # Reset all styles/colors
 
-command-exists() {
-  command -v "$@" >/dev/null 2>&1
-}
+BRA_LEFT="${BOLD}${GRAY}[${NC}"
+BRA_RIGHT="${BOLD}${GRAY}]${NC}"
 
 get-icon() {
   local arg=$1 bar
@@ -32,9 +38,9 @@ get-icon() {
   printf "%s " "${ticks[$arg]}"
 }
 
-__pure_diskspace_async=true # set to false to disable async fetch for diskspace
-diskspace() {
+__get_diskspace__() {
   local space avail unit icon perc data
+
   data=($(df -h . | tail -1))
 
   space=${data[3]}
@@ -53,12 +59,81 @@ diskspace() {
   icon=$(get-icon "${perc}")
 
   # displays the threshold in colors
+  local DISK_THRESHHOLD=$((avail / 5))
+
   if ((${space%*"${unit}"} > avail / 2)); then
-    printf "${BRIGHT_GREEN}${icon:-}%s${RESET}" "$space"
+    printf "${BRA_LEFT}${GREEN}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
   elif ((${space%*"${unit}"} > DISK_THRESHHOLD)); then
-    printf "${BRIGHT_YELLOW}${icon:-}%s${RESET}" "$space"
+    printf "${BRA_LEFT}${BOLD}${YELLOW}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
   else
-    printf "${BRIGHT_RED}${icon:-}%s${RESET}" "$space"
+    printf "${BRA_LEFT}${BOLD}${RED}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
+  fi
+}
+
+__get_git_status__() {
+  local git_status=""
+
+  pure_symbol_unpulled="${BOLD}${BLUE} ⇣${NC}"
+  pure_symbol_unpushed="${BOLD}${MAGENTA} ⇡${NC}"
+  pure_symbol_dirty="${BOLD}${RED} *${NC}"
+
+  __get_remote_status__() {
+    local pure_git_raw_remote_status
+    local UNPULLED
+
+    pure_git_raw_remote_status=$(git status --porcelain=2 --branch | command grep --only-matching --perl-regexp '\+\d+ \-\d+')
+
+    # shape raw status and check unpulled commit
+    UNPULLED=$(echo ${pure_git_raw_remote_status} | command grep --only-matching --perl-regexp '\-\d')
+    if [[ ${UNPULLED} != "-0" ]]; then
+      pure_git_unpulled=true
+    else
+      pure_git_unpulled=false
+    fi
+
+    # unpushed commit too
+    UNPUSHED=$(echo ${pure_git_raw_remote_status} | command grep --only-matching --perl-regexp '\+\d')
+    if [[ ${UNPUSHED} != "+0" ]]; then
+      pure_git_unpushed=true
+    else
+      pure_git_unpushed=false
+    fi
+
+    # if unpulled -> ⇣
+    # if unpushed -> ⇡
+    # if both (branched from remote) -> ⇣⇡
+    if ${pure_git_unpulled}; then
+
+      if ${pure_git_unpushed}; then
+        printf "%s" "${RED}${pure_symbol_unpulled}${pure_symbol_unpushed}${NC}"
+      else
+        printf "%s" "${BOLD}${RED}${pure_symbol_unpulled}${NC}"
+      fi
+
+    elif ${pure_git_unpushed}; then
+      printf "%s" "${BOLD}${BLUE}${pure_symbol_unpushed}${NC}"
+    fi
+  }
+
+  # if current directory isn't git repository, skip this
+  if [[ $(git rev-parse --is-inside-work-tree 2>/dev/null) == "true" ]]; then
+
+    git_status="$(git branch --show-current)"
+
+    # check clean/dirty
+    git_status="${git_status}$(git diff --quiet || echo "${pure_symbol_dirty}")"
+
+    # coloring
+    git_status="${GRAY}${git_status}${NC}"
+
+    # if repository have no remote, skip this
+    if [[ -n $(git remote show) ]]; then
+      git_status+="$(__get_remote_status__)"
+    fi
+  fi
+
+  if [[ -n "${git_status}" ]]; then
+    printf "${BRA_LEFT}%s${BRA_RIGHT}" "${git_status}"
   fi
 }
 
@@ -83,7 +158,7 @@ sanitize-project-name() {
   local after=2
   length=${#name}
 
-  if $DOCKER_STRIP_NAME; then
+  if $DOCKER_SANITIZE_NAME; then
     for ((i = 0; i < "$length"; i++)); do
       char=${name:${i}:1}                             # get one char from the name
       if [[ "${char}" =~ ([a-z]|[A-Z]|[0-9]) ]]; then # char is a a-z character
@@ -113,160 +188,11 @@ sanitize-project-name() {
   fi
 }
 
-# Colors
-BLACK=$(tput setaf 0)
-RED=$(tput setaf 1)
-GREEN=$(tput setaf 2)
-YELLOW=$(tput setaf 3)
-BLUE=$(tput setaf 4)
-MAGENTA=$(tput setaf 5)
-CYAN=$(tput setaf 6)
-WHITE=$(tput setaf 7)
-BRIGHT_BLACK=$(tput setaf 8)
-BRIGHT_RED=$(tput setaf 9)
-BRIGHT_GREEN=$(tput setaf 10)
-BRIGHT_YELLOW=$(tput setaf 11)
-BRIGHT_BLUE=$(tput setaf 12)
-BRIGHT_MAGENTA=$(tput setaf 13)
-BRIGHT_CYAN=$(tput setaf 14)
-
-BRA_LEFT="${BRIGHT_BLACK}[${RESET}"
-BRA_RIGHT="${BRIGHT_BLACK}]${RESET}"
-
-readonly RESET=$(tput sgr0)
-
-# symbols
-pure_prompt_symbol="❯"
-pure_symbol_unpulled="⇣"
-pure_symbol_unpushed="⇡"
-pure_symbol_dirty="*"
-# pure_git_stash_symbol="≡"
-
-# if this value is true, remote status update will be async
-pure_git_async_update=true
-pure_git_raw_remote_status="+0 -0"
-
-__pure_echo_git_remote_status() {
-  # get unpulled & unpushed status
-  # if ${pure_git_async_update}; then
-  # do async
-  # FIXME: this async execution doesn't change pure_git_raw_remote_status. so remote status never changes in async mode
-  # FIXME: async mode takes as long as sync mode
-  # pure_git_raw_remote_status=$(git status --porcelain=2 --branch | command grep --only-matching --perl-regexp '\+\d+ \-\d+') &
-  # else
-  # do sync
-  pure_git_raw_remote_status=$(git status --porcelain=2 --branch | command grep --only-matching --perl-regexp '\+\d+ \-\d+')
-  # fi
-
-  # shape raw status and check unpulled commit
-  local readonly UNPULLED=$(echo ${pure_git_raw_remote_status} | command grep --only-matching --perl-regexp '\-\d')
-  if [[ ${UNPULLED} != "-0" ]]; then
-    pure_git_unpulled=true
-  else
-    pure_git_unpulled=false
-  fi
-
-  # unpushed commit too
-  local readonly UNPUSHED=$(echo ${pure_git_raw_remote_status} | command grep --only-matching --perl-regexp '\+\d')
-  if [[ ${UNPUSHED} != "+0" ]]; then
-    pure_git_unpushed=true
-  else
-    pure_git_unpushed=false
-  fi
-
-  # if unpulled -> ⇣
-  # if unpushed -> ⇡
-  # if both (branched from remote) -> ⇣⇡
-  if ${pure_git_unpulled}; then
-
-    if ${pure_git_unpushed}; then
-      echo "${RED}${pure_symbol_unpulled}${pure_symbol_unpushed}${RESET}"
-    else
-      echo "${BRIGHT_RED}${pure_symbol_unpulled}${RESET}"
-    fi
-
-  elif ${pure_git_unpushed}; then
-    echo "${BRIGHT_BLUE}${pure_symbol_unpushed}${RESET}"
-  fi
-}
-
-__pure_update_git_status() {
-
-  local git_status=""
-
-  # if current directory isn't git repository, skip this
-  if [[ $(git rev-parse --is-inside-work-tree 2>/dev/null) == "true" ]]; then
-
-    git_status="$(git branch --show-current)"
-
-    # check clean/dirty
-    git_status="${git_status}$(git diff --quiet || echo "${pure_symbol_dirty}")"
-
-    # coloring
-    git_status="${BRIGHT_BLACK}${git_status}${RESET}"
-
-    # if repository have no remote, skip this
-    if [[ -n $(git remote show) ]]; then
-      git_status="${git_status} $(__pure_echo_git_remote_status)"
-    fi
-  fi
-
-  pure_git_status=${git_status}
-}
-
-# detect remote session and if so display user and host
-# if [[ -n "$SSH_CLIENT" || -n "$SSH_TTY" || -n "$SSH_CONNECTION" ]]; then
-if ((${#SSH_CLIENT} > 0 || ${#SSH_TTY} > 0 || ${#SSH_CONNECTION} > 0)); then
-  ENABLE_SSH=true
-else
-  ENABLE_SSH=false
-fi
-
-# if last command failed, change prompt color
-__pure_echo_prompt_color() {
-
-  if [[ $? = 0 ]]; then
-    echo ${pure_user_color}
-  else
-    echo ${RED}
-  fi
-}
-
-__pure_update_prompt_color() {
-  pure_prompt_color=$(__pure_echo_prompt_color)
-  if ${__pure_diskspace_async}; then
-    DISK_SPACE=$(diskspace &)
-  else
-    DISK_SPACE=$(diskspace 2>/dev/null)
-  fi
-
-  SPACING=$(create-spacer)
-}
-
-create-spacer() {
-  local cols diff grmstaus
-
-  # if git status &>/dev/null; then
-  #   grmstatus=$(__pure_echo_git_remote_status)
-  #   grmstatus="${grmstatus}igitt"
-  #   diff=$((${#PWD} + ${#USER} + ${#grmstatus} + 1))
-  # else
-  #   diff=$((${#PWD} + ${#USER}))
-  # fi
-
-  diff=$((${#PWD} + ${#USER} + ${#DISK_SPACE} - 8))
-
-  cols=$((COLUMNS - diff))
-
-  for ((i = 0; i < cols; i++)); do
-    printf " "
-  done
-}
-
-__pure_update_compose_status() {
+__get_docker_container__() {
   local compose_file=""
   local dir="$PWD"
   local service temp_compose_status
+  local icon="${BLUE} ${NC}"
 
   # walk up until root to find docker-compose.yml or compose.yml
   while [[ "$dir" != "/" ]]; do
@@ -280,6 +206,8 @@ __pure_update_compose_status() {
   done
 
   if [[ -n "$compose_file" ]]; then
+    DOCKER_FILE_FOUND=true
+
     local project_name
     project_name=$(basename "$(dirname "$compose_file")")
     # project_name=$(docker compose -f "$compose_file" ps --status running --services | head -1)
@@ -296,68 +224,87 @@ __pure_update_compose_status() {
       # if [[ $(docker compose -f "$compose_file" ps --status running --services 2>/dev/null | wc -l) -gt 0 ]]; then
       for service in "${docker_compose_services[@]}"; do
         service=$(sanitize-project-name "${service}")
-        temp_compose_status+="${BRA_LEFT}${BLUE}${service}${BRIGHT_GREEN}(up)${BRA_RIGHT}${RESET} " # keep the space to space out the projects
+        temp_compose_status+="${BRA_LEFT}${BLUE}${service} ${GREEN}(up)${BRA_RIGHT}${RESET} " # keep the space to space out the projects
       done
 
       [[ -n "${temp_compose_status}" ]] &&
         pure_compose_status=${temp_compose_status}
     else
-      pure_compose_status="${BRA_LEFT}${RED}${project_name}${BRIGHT_RED}(down)${BRA_RIGHT}${RESET}"
+      pure_compose_status="${BRA_LEFT}${BLUE}${project_name} ${RED}(down)${BRA_RIGHT}${RESET}"
     fi
     # else
     #   pure_compose_status="${YELLOW}${project_name}(?)${RESET}"
     # fi
   else
+    DOCKER_FILE_FOUND=false
     pure_compose_status=""
+  fi
+
+  if [[ -n "${pure_compose_status}" ]]; then
+    printf "${icon} %s" "${pure_compose_status}"
   fi
 }
 
-# if user is root, prompt is BRIGHT_YELLOW
-case ${UID} in
-0) pure_user_color=${BRIGHT_YELLOW} ;;
-*) pure_user_color=${BRIGHT_MAGENTA} ;;
-esac
+__update__vars() {
+  local err=$? # has to be the first, as it has to evaluate the last command state
 
-# if git isn't installed when shell launches, git integration isn't activated -
-# same for docker
-if $ENABLE_GIT_DISPLAY; then
-  if command-exists git; then
-    # PROMPT_COMMAND+="; __pure_update_prompt_color"
-    PROMPT_COMMAND="__pure_update_git_status; ${PROMPT_COMMAND}"
+  local CWD DISKSPACE
+  local info=""
+
+  # status color for the prompt symbol
+  if ((err <= 0)); then
+    STATUS=${MAGENTA}
+  else
+    STATUS=${RED}
   fi
-fi
 
-if $ENABLE_DOCKER_DISPLAY; then
-  DOCKER_LINE=""
+  info="${MAGENTA}${USER}${NC}"
 
-  if command-exists docker; then
-    PROMPT_COMMAND="__pure_update_compose_status; ${PROMPT_COMMAND}"
-    DOCKER_LINE="\${pure_compose_status}\n"
+  if $ENABLE_DOCKER; then
+    if [[ -n "$(__get_docker_container__)" ]]; then
+      DOCKER_LINE=$(__get_docker_container__)$'\n'
+      info="${DOCKER_LINE}$info"
+    else
+      DOCKER_LINE=""
+    fi
+  else
+    DOCKER_LINE=""
   fi
-fi
 
-PROMPT_COMMAND="__pure_update_prompt_color; ${PROMPT_COMMAND}"
+  # current working directory with $HOME replcaed with ~
+  CWD=${PWD/"$HOME"/"~"}
+  if $ENABLE_SSH; then
+    # for ssh connections
+    if [[ -n $SSH_CONNECTION ]]; then
+      info="${BOLD}${MAGENTA}${USER}@${RED}${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
+      # INFO_LINE="${BOLD}${MAGENTA}${USER}@${RED}${HOSTNAME}${NC}${CYAN}:${CWD}${NC} ${DISKSPACE} ${GIT_STATUS}"
+    else
+      info+="${CYAN}:${CWD}${NC}"
+      # INFO_LINE="${MAGENTA}$USER${CYAN}:${CWD}${NC} ${DISKSPACE} ${GIT_STATUS}"
+    fi
+  else
+    info+="${CYAN}:${CWD}${NC}"
+    # INFO_LINE="${MAGENTA}$USER${CYAN}:${CWD}${NC} ${DISKSPACE} ${GIT_STATUS}"
+  fi
 
-# : "${SPACING:=$(create-spacer)}"
+  if $ENABLE_DISKSPACE; then
+    DISKSPACE="$(__get_diskspace__)"
 
-if $ENABLE_DISKSPACE; then
-  # FIRST_LINE="${USER_HOST}${CYAN}\w ${BRA_LEFT}\${DISK_SPACE}${BRA_RIGHT}\${SPACING}${MAGENTA}\${pure_git_status}\n"
-  FIRST_LINE="${USER_HOST}${CYAN}\w ${BRA_LEFT}\${DISK_SPACE}${BRA_RIGHT} ${MAGENTA}\${pure_git_status}\n"
-else
-  FIRST_LINE="${USER_HOST}${CYAN}\w \${pure_git_status}\n"
-fi
+    info+=" ${DISKSPACE}"
+  fi
 
-# raw using of $ANY_COLOR (or $(tput setaf ***)) here causes a creepy bug when go back history with up arrow key
-# I couldn't find why it occurs
-SECOND_LINE="\[\${pure_prompt_color}\]${pure_prompt_symbol}\[$RESET\] "
-if $ENABLE_SSH; then
-  PS1="\n${DOCKER_LINE}${pure_user_color}\u${RED}@\h:${FIRST_LINE}${SECOND_LINE}"
-else
-  PS1="\n${DOCKER_LINE}${pure_user_color}\u:${FIRST_LINE}${SECOND_LINE}"
-fi
+  if $ENABLE_GIT; then
+    GIT_STATUS="$(__get_git_status__)"
 
-PS2="\[$BLUE\]${prompt_symbol}\[$RESET\] "
+    info+=" ${GIT_STATUS}"
+  fi
 
-if command-exists zoxide; then
-  eval "$(zoxide init bash)"
-fi
+  INFO_LINE="$info"
+}
+
+PROMPT_SYMBOL="\${STATUS}❯ ${NC}"
+PROMPT_COMMAND="__update__vars; ${PROMPT_COMMAND}"
+
+# This ensures the docker line is set if a composefile was found. Otherwise does
+# NOT generate an empty line above
+PS1="\${INFO_LINE}\n${PROMPT_SYMBOL}"
