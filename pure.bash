@@ -11,6 +11,13 @@ ENABLE_UPTIME=false   # set to `true` to enable UPTIME module
 
 DOCKER_SANITIZE_NAME=false
 
+# INFO:
+# set custom left and right separators for the widgts like git, docker, diskspace,  uptime..
+# you can for example set ( and ) | Default is [ and ]
+#
+# SEPARATOR_LEFT="("
+# SEPARATOR_RIGHT=")"
+
 ## CAUTION:
 ## Do not edit anything after this line, unless you know what you are doing!
 
@@ -36,8 +43,8 @@ STRIKE=$'\e[9m' # Strikethrough
 
 NC=$'\e[0m' # Reset all styles/colors
 
-BRA_LEFT="${BOLD}${GRAY}[${NC}"
-BRA_RIGHT="${BOLD}${GRAY}]${NC}"
+BRA_LEFT="${BOLD}${GRAY}${SEPARATOR_LEFT:-[}${NC}"
+BRA_RIGHT="${BOLD}${GRAY}${SEPARATOR_RIGHT:-]}${NC}"
 
 command-exists() {
   command -v "$@" >/dev/null 2>&1
@@ -45,7 +52,12 @@ command-exists() {
 
 __pure_get_diskspace_icon__() {
   local arg=$1
-  local ticks=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
+
+  if $ENABLE_NERDFONTS; then
+    local ticks=(󰪞 󰪟 󰪠 󰪡 󰪢 󰪣 󰪤 󰪥)
+  else
+    local ticks=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
+  fi
 
   arg=$((arg * ${#ticks[@]} / 101))
 
