@@ -397,17 +397,17 @@ __update__vars() {
     info+=" ${DISKSPACE}"
   fi
 
-  if $ENABLE_UPTIME; then
-    UPTIME="$(__get_uptime__)"
-
-    info+=" ${UPTIME}"
-  fi
-
   if $ENABLE_GIT; then
     GIT_STATUS="$(__get_git_status__)"
 
     [[ -n "$GIT_STATUS" ]] &&
       info+=" ${GIT_STATUS}"
+  fi
+
+  if $ENABLE_UPTIME; then
+    UPTIME="$(__get_uptime__)"
+
+    info+=" ${UPTIME}"
   fi
 
   INFO_LINE="${info}"
