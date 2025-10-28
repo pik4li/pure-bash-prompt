@@ -7,7 +7,7 @@ ENABLE_GIT=true       # set to `false` to disable GIT module
 ENABLE_SSH=true       # set to `false` to disable SSH module
 ENABLE_DOCKER=true    # set to `false` to disable DOCKER module
 ENABLE_DISKSPACE=true # set to `false` to disable DISKSPACE module
-ENABLE_UPTIME=true    # set to `true` to enable UPTIME module
+ENABLE_UPTIME=false   # set to `true` to enable UPTIME module
 
 DOCKER_SANITIZE_NAME=false
 
@@ -24,7 +24,6 @@ BLUE=$'\e[34m'
 MAGENTA=$'\e[35m'
 CYAN=$'\e[36m'
 WHITE=$'\e[37m'
-
 GRAY=$'\e[38;5;239m'
 
 # Styles
@@ -45,7 +44,7 @@ command-exists() {
 }
 
 __pure_get_diskspace_icon__() {
-  local arg=$1 bar
+  local arg=$1
   local ticks=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
 
   arg=$((arg * ${#ticks[@]} / 101))
@@ -59,25 +58,26 @@ __get_diskspace__() {
   data=($(df -h . | tail -1))
 
   space=${data[3]}
+  unit=${space: -1} # like G or T depending on the size of the disk
+
   avail=${data[1]}
   perc=${data[4]}
 
+  # make sure only numbers exist for equations
   perc=${perc%\%}
-
-  avail=${avail%*G}
-  avail=${avail%*T}
-  unit=${space: -1}
+  avail=${avail%"$unit"}
+  space=${space%"$unit"}
 
   icon=$(__pure_get_diskspace_icon__ "${perc}")
 
   if ((perc >= 85)); then
-    printf "${BRA_LEFT}${BOLD}${RED}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
+    printf "${BRA_LEFT}${BOLD}${RED}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
   elif ((perc >= 67)); then
-    printf "${BRA_LEFT}${BOLD}${ORANGE}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
+    printf "${BRA_LEFT}${BOLD}${ORANGE}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
   elif ((perc >= 34)); then
-    printf "${BRA_LEFT}${BOLD}${YELLOW}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
+    printf "${BRA_LEFT}${BOLD}${YELLOW}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
   else
-    printf "${BRA_LEFT}${BOLD}${GREEN}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
+    printf "${BRA_LEFT}${BOLD}${GREEN}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
   fi
 }
 
