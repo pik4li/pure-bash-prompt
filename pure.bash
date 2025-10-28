@@ -389,7 +389,13 @@ __update__vars() {
   INFO_LINE="${info}"
 }
 
-PROMPT_SYMBOL="\${STATUS}❯ ${NC}"
+if $ENABLE_NERDFONTS; then
+  __prompt_nerdfont_icon__="" # some other variants..: " "  "" "󰶻 "
+
+  PROMPT_SYMBOL="\${STATUS}${__prompt_nerdfont_icon__} ${NC}"
+else
+  PROMPT_SYMBOL="\${STATUS}❯ ${NC}"
+fi
 PROMPT_COMMAND="__update__vars; ${PROMPT_COMMAND}"
 
 # This ensures the docker line is set if a composefile was found. Otherwise does
