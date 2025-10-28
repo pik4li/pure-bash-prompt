@@ -16,15 +16,18 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 
 - **git-status**:
 
-![git-status](assets/git-status.png)
+<!-- ![git-status](assets/git-status.png) -->
+![git-status](assets/git-status.pure-prompt.gif)
 
 - **docker-status** (ssh):
 > note that the `hostname` gets also displayed along the `username`, when connecting
 > via **ssh**
 
-![docker-showcase-up-one](assets/docker-showcase-up.png)
+![docker-showcase](assets/docker-status.pure-prompt.gif)
 
-![docker-showcase-up-more](assets/docker-showcase-up-more.png)
+<!-- ![docker-showcase-up-one](assets/docker-showcase-up.png) -->
+<!---->
+<!-- ![docker-showcase-up-more](assets/docker-showcase-up-more.png) -->
 
 </details>
 
@@ -37,6 +40,17 @@ source /path/to/pure.bash
 ```
 
 to your `.bashrc`
+
+## settings
+
+You can set some settings in the prompt file itself:
+
+| key | default_value | properties |
+| - | - | - |
+| `ENABLE_DOCKER` | `true` | Enables or disables the docker line |
+| `ENABLE_GIT` | `true` | Enables or disables the git widget |
+| `ENABLE_SSH`  | `true` | Enables the ssh detection with hostname prefix for ssh sessions |
+| `ENABLE_DISKSPACE` | `true` | Enables the diskspace widget |
 
 ## Uninstall
 
