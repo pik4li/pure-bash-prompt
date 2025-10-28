@@ -12,6 +12,7 @@ BLACK=$'\e[30m'
 RED=$'\e[31m'
 GREEN=$'\e[32m'
 YELLOW=$'\e[33m'
+ORANGE=$'\e[38;5;202m'
 BLUE=$'\e[34m'
 MAGENTA=$'\e[35m'
 CYAN=$'\e[36m'
@@ -40,7 +41,7 @@ __pure_get_diskspace_icon__() {
   local arg=$1 bar
   local ticks=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
 
-  arg=$((arg * ${#ticks[@]} / 100))
+  arg=$((arg * ${#ticks[@]} / 101))
 
   printf "%s " "${ticks[$arg]}"
 }
@@ -62,15 +63,14 @@ __get_diskspace__() {
 
   icon=$(__pure_get_diskspace_icon__ "${perc}")
 
-  # displays the threshold in colors
-  local DISK_THRESHHOLD=$((avail / 5))
-
-  if ((${space%*"${unit}"} > avail / 2)); then
-    printf "${BRA_LEFT}${GREEN}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
-  elif ((${space%*"${unit}"} > DISK_THRESHHOLD)); then
+  if ((perc >= 85)); then
+    printf "${BRA_LEFT}${BOLD}${RED}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
+  elif ((perc >= 67)); then
+    printf "${BRA_LEFT}${BOLD}${ORANGE}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
+  elif ((perc >= 34)); then
     printf "${BRA_LEFT}${BOLD}${YELLOW}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
   else
-    printf "${BRA_LEFT}${BOLD}${RED}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
+    printf "${BRA_LEFT}${BOLD}${GREEN}${icon:-}%s${NC}${BRA_RIGHT}" "$space"
   fi
 }
 
