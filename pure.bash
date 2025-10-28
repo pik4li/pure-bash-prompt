@@ -1,13 +1,13 @@
 # ╭────────────╮
 # │  Settings  │
 # ╰────────────╯
+ENABLE_NERDFONTS=true # set to `false` if you do not have nerdfonts installed
+
 ENABLE_GIT=true       # set to `false` to disable GIT module
 ENABLE_SSH=true       # set to `false` to disable SSH module
 ENABLE_DOCKER=true    # set to `false` to disable DOCKER module
 ENABLE_DISKSPACE=true # set to `false` to disable DISKSPACE module
-
-ENABLE_SSH_ICON=true    # set to `false` if you do not have nerdfonts installed
-ENABLE_DOCKER_ICON=true # set to `false` if you do not have nerdfonts installed
+ENABLE_UPTIME=true    # set to `true` to enable UPTIME module
 
 DOCKER_SANITIZE_NAME=false
 
@@ -225,7 +225,7 @@ __get_docker_container__() {
   local dir="$PWD"
   local service temp_compose_status
 
-  if $ENABLE_DOCKER_ICON; then
+  if $ENABLE_NERDFONTS; then
     local icon="${BLUE} ${NC}"
   fi
 
@@ -278,6 +278,37 @@ __get_docker_container__() {
   fi
 }
 
+__get_uptime__() {
+  local ut=$(uptime -p)
+
+  if $ENABLE_NERDFONTS; then
+    ut=${ut/up /"${BOLD}${GRAY}󰔛 ${NC}"}
+  else
+    ut=${ut/up /"${BOLD}${GRAY}up${NC}"}
+  fi
+
+  # redraw minutes
+  ut=${ut/ minutes/"${BOLD}${YELLOW}m${NC}"}
+  ut=${ut/ minute/"${BOLD}${YELLOW}m${NC}"}
+
+  # redraw hours
+  ut=${ut/ hours\,/"${BOLD}${ORANGE}h,${NC}"}
+  ut=${ut/ hour\,/"${BOLD}${ORANGE}h,${NC}"}
+
+  # redraw days
+  ut=${ut/days\,/"${BOLD}${RED}d,${NC}"}
+  ut=${ut/day\,/"${BOLD}${RED}d,${NC}"}
+
+  # redraw years
+  ut=${ut/years\,/"${BOLD}${MAGENTA}y,${NC}"}
+  ut=${ut/year\,/"${BOLD}${MAGENTA}y,${NC}"}
+
+  # $ut exists, or return nothing
+  [[ -n "${ut}" ]] || return
+
+  printf "${BRA_LEFT}%s${BRA_RIGHT}" "${ut}"
+}
+
 __update__vars() {
   local err=$? # has to be the first, as it has to evaluate the last command state
   local CWD DISKSPACE
@@ -285,7 +316,7 @@ __update__vars() {
 
   info="${MAGENTA}${USER}${NC}"
 
-  if $ENABLE_SSH_ICON; then
+  if $ENABLE_NERDFONTS; then
     local ssh_icon="${GRAY}󰢹 ${NC}"
   fi
 
@@ -328,6 +359,12 @@ __update__vars() {
     DISKSPACE="$(__get_diskspace__)"
 
     info+=" ${DISKSPACE}"
+  fi
+
+  if $ENABLE_UPTIME; then
+    UPTIME="$(__get_uptime__)"
+
+    info+=" ${UPTIME}"
   fi
 
   if $ENABLE_GIT; then
