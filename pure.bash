@@ -3,7 +3,9 @@
 # ╰────────────╯
 ENABLE_GIT=true
 ENABLE_SSH=true
+ENABLE_SSH_ICON=true
 ENABLE_DOCKER=true
+ENABLE_DOCKER_ICON=true
 ENABLE_DISKSPACE=true
 DOCKER_SANITIZE_NAME=false
 
@@ -214,7 +216,10 @@ __get_docker_container__() {
   local compose_file=""
   local dir="$PWD"
   local service temp_compose_status
-  local icon="${BLUE} ${NC}"
+
+  if $ENABLE_DOCKER_ICON; then
+    local icon="${BLUE} ${NC}"
+  fi
 
   # walk up until root to find docker-compose.yml or compose.yml
   while [[ "$dir" != "/" ]]; do
@@ -228,7 +233,6 @@ __get_docker_container__() {
   done
 
   if [[ -n "$compose_file" ]]; then
-    DOCKER_FILE_FOUND=true
 
     local project_name
     project_name=$(basename "$(dirname "$compose_file")")
@@ -258,7 +262,6 @@ __get_docker_container__() {
     #   pure_compose_status="${YELLOW}${project_name}(?)${RESET}"
     # fi
   else
-    DOCKER_FILE_FOUND=false
     pure_compose_status=""
   fi
 
@@ -269,9 +272,14 @@ __get_docker_container__() {
 
 __update__vars() {
   local err=$? # has to be the first, as it has to evaluate the last command state
-
   local CWD DISKSPACE
   local info=""
+
+  info="${MAGENTA}${USER}${NC}"
+
+  if $ENABLE_SSH_ICON; then
+    local ssh_icon="${GRAY}󰢹 ${NC}"
+  fi
 
   # status color for the prompt symbol
   if ((err <= 0)); then
@@ -280,25 +288,13 @@ __update__vars() {
     STATUS=${RED}
   fi
 
-  info="${MAGENTA}${USER}${NC}"
-
-  if $ENABLE_DOCKER; then
-    if [[ -n "$(__get_docker_container__)" ]]; then
-      DOCKER_LINE=$(__get_docker_container__)$'\n'
-      info="${DOCKER_LINE}$info"
-    else
-      DOCKER_LINE=""
-    fi
-  else
-    DOCKER_LINE=""
-  fi
-
   # current working directory with $HOME replcaed with ~
   CWD=${PWD/"$HOME"/"~"}
+
   if $ENABLE_SSH; then
     # for ssh connections
     if [[ -n $SSH_CONNECTION ]]; then
-      info="${BOLD}󰣀 ${MAGENTA}${USER}@${RED}${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
+      info="${BOLD}${ssh_icon}${MAGENTA}${UNDERLINE}${USER}${MAGENTA}@${RED}${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
       # INFO_LINE="${BOLD}${MAGENTA}${USER}@${RED}${HOSTNAME}${NC}${CYAN}:${CWD}${NC} ${DISKSPACE} ${GIT_STATUS}"
     else
       info+="${CYAN}:${CWD}${NC}"
@@ -307,6 +303,17 @@ __update__vars() {
   else
     info+="${CYAN}:${CWD}${NC}"
     # INFO_LINE="${MAGENTA}$USER${CYAN}:${CWD}${NC} ${DISKSPACE} ${GIT_STATUS}"
+  fi
+
+  if $ENABLE_DOCKER; then
+    if [[ -n "$(__get_docker_container__)" ]]; then
+      DOCKER_LINE=$(__get_docker_container__)$'\n'
+      info="${DOCKER_LINE}${info}"
+    else
+      DOCKER_LINE=""
+    fi
+  else
+    DOCKER_LINE=""
   fi
 
   if $ENABLE_DISKSPACE; then
