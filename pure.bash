@@ -330,10 +330,3 @@ PROMPT_COMMAND="__update__vars; ${PROMPT_COMMAND}"
 # This ensures the docker line is set if a composefile was found. Otherwise does
 # NOT generate an empty line above
 PS1="\n\${INFO_LINE}\n${PROMPT_SYMBOL}"
-
-if command-exists zoxide; then
-  eval "$(zoxide init bash)"
-  alias zz="zoxide query --interactive"
-fi
-alias ..="cd .."
-. "$HOME/.bashenv"
