@@ -124,14 +124,23 @@ __get_git_status__() {
 
     git_status="$(git branch --show-current)"
 
-    local gitdiff diff
-    gitdiff=$(git diff --quiet)
+    git diff --quiet &>/dev/null
 
-    if ((${#gitdiff} <= 0)); then
+    local err=$?
+
+    if ((err > 0)); then
       diff="$pure_symbol_dirty"
     else
       diff=""
     fi
+
+    # gitdiff=$(git diff --quiet)
+    #
+    # if ((${#gitdiff} <= 0)); then
+    #   diff=""
+    # else
+    #   diff="$pure_symbol_dirty"
+    # fi
 
     # check clean/dirty
     git_status="${git_status}${diff}"
