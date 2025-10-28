@@ -11,23 +11,24 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 - **disk-analyzer**:
 > has color values for 'above 50%', 'below 50%', and 'below threshhold' <- the
 > threshhold is configurable via a VARIABLE
+>
+> `ENABLE_DISKSPACE=true`
 
 ![disk-analyzer](assets/disk-analyzer.png)
 
-- **git-status**:
+---
 
-<!-- ![git-status](assets/git-status.png) -->
+- **git-status**:
+> `ENABLE_GIT=true`
+
 ![git-status](assets/git-status.pure-prompt.gif)
 
-- **docker-status** (ssh):
-> note that the `hostname` gets also displayed along the `username`, when connecting
-> via **ssh**
+---
+
+- **docker-status**:
+> `ENABLE_DOCKER=true`
 
 ![docker-showcase](assets/docker-status.pure-prompt.gif)
-
-<!-- ![docker-showcase-up-one](assets/docker-showcase-up.png) -->
-<!---->
-<!-- ![docker-showcase-up-more](assets/docker-showcase-up-more.png) -->
 
 </details>
 
@@ -51,6 +52,7 @@ You can set some settings in the prompt file itself:
 | `ENABLE_GIT` | `true` | Enables or disables the git widget |
 | `ENABLE_SSH`  | `true` | Enables the ssh detection with hostname prefix for ssh sessions |
 | `ENABLE_DISKSPACE` | `true` | Enables the diskspace widget |
+| `DOCKER_SANITIZE_NAME` | `false` | Enables or disables the docker project name sanitization |
 
 ## Uninstall
 
