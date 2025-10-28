@@ -312,7 +312,7 @@ __get_uptime__() {
   if $ENABLE_NERDFONTS; then
     ut=${ut/up /"${BOLD}${UPTIME_COLOR}󰔛 ${NC}"}
   else
-    ut=${ut/up /"${BOLD}${UPTIME_COLOR}up${NC}"}
+    ut=${ut/up/"${BOLD}${UPTIME_COLOR}up${NC}"}
   fi
 
   # redraw minutes
