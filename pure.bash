@@ -1,13 +1,18 @@
 # ╭────────────╮
 # │  Settings  │
 # ╰────────────╯
-ENABLE_GIT=true
-ENABLE_SSH=true
-ENABLE_SSH_ICON=true
-ENABLE_DOCKER=true
-ENABLE_DOCKER_ICON=true
-ENABLE_DISKSPACE=true
+ENABLE_GIT=true       # set to `false` to disable GIT module
+ENABLE_SSH=true       # set to `false` to disable SSH module
+ENABLE_DOCKER=true    # set to `false` to disable DOCKER module
+ENABLE_DISKSPACE=true # set to `false` to disable DISKSPACE module
+
+ENABLE_SSH_ICON=true    # set to `false` if you do not have nerdfonts installed
+ENABLE_DOCKER_ICON=true # set to `false` if you do not have nerdfonts installed
+
 DOCKER_SANITIZE_NAME=false
+
+## CAUTION:
+## Do not edit anything after this line, unless you know what you are doing!
 
 # Basic Colors
 BLACK=$'\e[30m'
@@ -328,10 +333,11 @@ __update__vars() {
   if $ENABLE_GIT; then
     GIT_STATUS="$(__get_git_status__)"
 
-    info+=" ${GIT_STATUS}"
+    [[ -n "$GIT_STATUS" ]] &&
+      info+=" ${GIT_STATUS}"
   fi
 
-  INFO_LINE="$info"
+  INFO_LINE="${info}"
 }
 
 PROMPT_SYMBOL="\${STATUS}❯ ${NC}"
