@@ -127,7 +127,7 @@ __get_git_status__() {
     local gitdiff diff
     gitdiff=$(git diff --quiet)
 
-    if [[ -n "${gitdiff}" ]]; then
+    if ((${#gitdiff} <= 0)); then
       diff="$pure_symbol_dirty"
     else
       diff=""
