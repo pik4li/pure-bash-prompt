@@ -7,7 +7,7 @@ ENABLE_GIT=true       # set to `false` to disable GIT module
 ENABLE_SSH=true       # set to `false` to disable SSH module
 ENABLE_DOCKER=true    # set to `false` to disable DOCKER module
 ENABLE_DISKSPACE=true # set to `false` to disable DISKSPACE module
-ENABLE_UPTIME=true    # set to `true` to enable UPTIME module
+ENABLE_UPTIME=false   # set to `true` to enable UPTIME module
 
 DOCKER_SANITIZE_NAME=false
 
