@@ -36,7 +36,7 @@ command-exists() {
   command -v "$@" >/dev/null 2>&1
 }
 
-get-icon() {
+__pure_get_diskspace_icon__() {
   local arg=$1 bar
   local ticks=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
 
@@ -60,7 +60,7 @@ __get_diskspace__() {
   avail=${avail%*T}
   unit=${space: -1}
 
-  icon=$(get-icon "${perc}")
+  icon=$(__pure_get_diskspace_icon__ "${perc}")
 
   # displays the threshold in colors
   local DISK_THRESHHOLD=$((avail / 5))
@@ -156,7 +156,7 @@ __get_git_status__() {
 # │ default, so                                                             │
 # │ it prints the separator (e.g. '-') and one more character               │
 # ╰─────────────────────────────────────────────────────────────────────────╯
-sanitize-project-name() {
+__sanitize_docker_project_name__() {
   local name=$1 length newname="" i char accum=0 dots=false
   local first=true
   local after=2
@@ -217,7 +217,7 @@ __get_docker_container__() {
     # project_name=$(docker compose -f "$compose_file" ps --status running --services | head -1)
 
     ((${#project_name} > 8)) && {
-      project_name="$(sanitize-project-name "${project_name}")"
+      project_name="$(__sanitize_docker_project_name__ "${project_name}")"
       # project_name="${project_name:0:5}.."
     }
 
@@ -227,7 +227,7 @@ __get_docker_container__() {
       # if docker compose -f "$compose_file" ps --status running >/dev/null 2>&1; then
       # if [[ $(docker compose -f "$compose_file" ps --status running --services 2>/dev/null | wc -l) -gt 0 ]]; then
       for service in "${docker_compose_services[@]}"; do
-        service=$(sanitize-project-name "${service}")
+        service=$(__sanitize_docker_project_name__ "${service}")
         temp_compose_status+="${BRA_LEFT}${BLUE}${service} ${BOLD}${GREEN}(up)${BRA_RIGHT}${RESET} " # keep the space to space out the projects
       done
 
