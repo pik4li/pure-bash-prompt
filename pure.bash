@@ -308,12 +308,12 @@ __get_uptime__() {
   ut=${ut/ hour\,/"${BOLD}${ORANGE}h,${NC}"}
 
   # redraw days
-  ut=${ut/days\,/"${BOLD}${RED}d,${NC}"}
-  ut=${ut/day\,/"${BOLD}${RED}d,${NC}"}
+  ut=${ut/ days\,/"${BOLD}${RED}d,${NC}"}
+  ut=${ut/ day\,/"${BOLD}${RED}d,${NC}"}
 
   # redraw years
-  ut=${ut/years\,/"${BOLD}${MAGENTA}y,${NC}"}
-  ut=${ut/year\,/"${BOLD}${MAGENTA}y,${NC}"}
+  ut=${ut/ years\,/"${BOLD}${MAGENTA}y,${NC}"}
+  ut=${ut/ year\,/"${BOLD}${MAGENTA}y,${NC}"}
 
   # $ut exists, or return nothing
   [[ -n "${ut}" ]] || return
