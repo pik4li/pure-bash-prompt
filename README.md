@@ -8,7 +8,8 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 <details>
 <summary>Preview</summary>
 
-- **disk-analyzer**:
+### **disk-analyzer**:
+
 > has color values for 'above 50%', 'below 50%', and 'below threshhold' <- the
 > threshhold is configurable via a VARIABLE
 >
@@ -18,14 +19,16 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 
 ---
 
-- **git-status**:
+### **git-status**:
+
 > `ENABLE_GIT=true`
 
 ![git-status](assets/git-status.pure-prompt.gif)
 
 ---
 
-- **docker-status**:
+### **docker-status**:
+
 > `ENABLE_DOCKER=true`
 
 ![docker-showcase](assets/docker-status.pure-prompt.gif)
