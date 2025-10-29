@@ -15,7 +15,11 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 >
 > `ENABLE_DISKSPACE=true`
 
-![disk-analyzer](assets/disk-analyzer.png)
+![disk-analyzer "ENABLE_NERDFONTS=false")](assets/disk-analyzer.png)
+> `ENABLE_NERDFONTS=false`
+
+![disk-analyzer-nerdfont "ENABLE_NERDFONTS=true"](assets/disk-analyzer-nerdfont.png)
+> `ENABLE_NERDFONTS=true`
 
 ---
 
