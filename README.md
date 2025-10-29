@@ -10,7 +10,10 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 
 ### **disk-analyzer**:
 
-> has color values for 'above 33%', 'above 66%', 'above 87%', and 'less'
+> Displays the available space in numbers. The icon shows, how much space is
+> already taken
+>
+> Coloring has values for `above 33%`, `above 66%`, `above 87%`, and `less`
 >
 > `ENABLE_DISKSPACE=true`
 
@@ -28,6 +31,8 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 
 ### **error-codes**:
 
+> Does only show the error codes on error codes bigger than 0
+>
 > `ENABLE_ERROR_CODES=true`
 
 ![error-code-above-0](assets/error-code-above-0.png "Only shows above 0")
