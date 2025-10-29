@@ -48,6 +48,18 @@ NC=$'\e[0m' # Reset all styles/colors
 BRA_LEFT="${BOLD}${GRAY}${SEPARATOR_LEFT:-[}${NC}"
 BRA_RIGHT="${BOLD}${GRAY}${SEPARATOR_RIGHT:-]}${NC}"
 
+if $ENABLE_NERDFONTS; then
+  SSH_ICON_NF="${GRAY}󰢹 ${NC}"
+
+  __prompt_nerdfont_icon__="" # some other variants..: " "  "" "󰶻 "
+  PROMPT_SYMBOL="\${STATUS}${__prompt_nerdfont_icon__} ${NC}"
+
+  DISKSPACE_ICONS_NF=(󰪞 󰪟 󰪠 󰪡 󰪢 󰪣 󰪤 󰪥)
+else
+  PROMPT_SYMBOL="\${STATUS}❯ ${NC}"
+  DISKSPACE_ICONS_NF=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
+fi
+
 command-exists() {
   command -v "$@" >/dev/null 2>&1
 }
@@ -55,15 +67,8 @@ command-exists() {
 __pure_get_diskspace_icon__() {
   local arg=$1
 
-  if $ENABLE_NERDFONTS; then
-    local ticks=(󰪞 󰪟 󰪠 󰪡 󰪢 󰪣 󰪤 󰪥)
-  else
-    local ticks=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
-  fi
-
-  arg=$((arg * ${#ticks[@]} / 101))
-
-  printf "%s " "${ticks[$arg]}"
+  arg=$((arg * ${#DISKSPACE_ICONS_NF[@]} / 101))
+  printf "%s " "${DISKSPACE_ICONS_NF[$arg]}"
 }
 
 __get_diskspace__() {
@@ -353,10 +358,6 @@ __update__vars() {
 
   info="${USERCOLOR}${USER}${NC}"
 
-  if $ENABLE_NERDFONTS; then
-    local ssh_icon="${GRAY}󰢹 ${NC}"
-  fi
-
   # status color for the prompt symbol
   if ((err == 0)); then
     STATUS=${MAGENTA}
@@ -374,15 +375,12 @@ __update__vars() {
   if $ENABLE_SSH; then
     # for ssh connections
     if [[ -n $SSH_CONNECTION ]]; then
-      info="${BOLD}${ssh_icon}${MAGENTA}${UNDERLINE}${USER}${MAGENTA}@${RED}${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
-      # INFO_LINE="${BOLD}${MAGENTA}${USER}@${RED}${HOSTNAME}${NC}${CYAN}:${CWD}${NC} ${DISKSPACE} ${GIT_STATUS}"
+      info="${BOLD}${SSH_ICON_NF}${MAGENTA}${UNDERLINE}${USER}${MAGENTA}@${RED}${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
     else
       info+="${CYAN}:${CWD}${NC}"
-      # INFO_LINE="${MAGENTA}$USER${CYAN}:${CWD}${NC} ${DISKSPACE} ${GIT_STATUS}"
     fi
   else
     info+="${CYAN}:${CWD}${NC}"
-    # INFO_LINE="${MAGENTA}$USER${CYAN}:${CWD}${NC} ${DISKSPACE} ${GIT_STATUS}"
   fi
 
   if $ENABLE_DOCKER; then
@@ -418,15 +416,5 @@ __update__vars() {
   INFO_LINE="${info}"
 }
 
-if $ENABLE_NERDFONTS; then
-  __prompt_nerdfont_icon__="" # some other variants..: " "  "" "󰶻 "
-
-  PROMPT_SYMBOL="\${STATUS}${__prompt_nerdfont_icon__} ${NC}"
-else
-  PROMPT_SYMBOL="\${STATUS}❯ ${NC}"
-fi
 PROMPT_COMMAND="__update__vars; ${PROMPT_COMMAND}"
-
-# This ensures the docker line is set if a composefile was found. Otherwise does
-# NOT generate an empty line above
 PS1="\n\${INFO_LINE}\n${PROMPT_SYMBOL}"
