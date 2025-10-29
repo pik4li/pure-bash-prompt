@@ -9,6 +9,8 @@ ENABLE_DOCKER=true    # set to `false` to disable DOCKER module
 ENABLE_DISKSPACE=true # set to `false` to disable DISKSPACE module
 ENABLE_UPTIME=false   # set to `true` to enable UPTIME module
 
+ENABLE_ERROR_CODES=true # set to `false` to disable the error codes inline
+
 DOCKER_SANITIZE_NAME=false
 
 # INFO:
@@ -19,7 +21,7 @@ DOCKER_SANITIZE_NAME=false
 # SEPARATOR_RIGHT=")"
 
 ## CAUTION:
-## Do not edit anything after this line, unless you know what you are doing!
+## Do not edit anything beyond this line, unless you know what you are doing!
 
 # Basic Colors
 BLACK=$'\e[30m'
@@ -69,11 +71,11 @@ __get_diskspace__() {
 
   data=($(df -h . | tail -1))
 
-  space=${data[3]}
-  unit=${space: -1} # like G or T depending on the size of the disk
-
   avail=${data[1]}
   perc=${data[4]}
+
+  space=${data[3]}
+  unit=${space: -1} # like G or T depending on the size of the disk
 
   # make sure only numbers exist for equations
   perc=${perc%\%}
@@ -126,7 +128,6 @@ __get_git_status__() {
     # if unpushed -> ⇡
     # if both (branched from remote) -> ⇣⇡
     if ${pure_git_unpulled}; then
-
       if ${pure_git_unpushed}; then
         printf "%s" "${RED}${pure_symbol_unpulled}${pure_symbol_unpushed}${NC}"
       else
@@ -148,27 +149,19 @@ __get_git_status__() {
 
     git diff --quiet &>/dev/null
 
-    local err=$?
+    local err=$? # get errorcode - 0 if no changes are there
 
-    if ((err > 0)); then
+    if ((err != 0)); then
       diff="$pure_symbol_dirty"
     else
       diff=""
     fi
 
-    # gitdiff=$(git diff --quiet)
-    #
-    # if ((${#gitdiff} <= 0)); then
-    #   diff=""
-    # else
-    #   diff="$pure_symbol_dirty"
-    # fi
+    # coloring
+    git_status="${GRAY}${git_status}${NC}"
 
     # check clean/dirty
     git_status="${git_status}${diff}"
-
-    # coloring
-    git_status="${GRAY}${git_status}${NC}"
 
     # if repository have no remote, skip this
     if [[ -n $(git remote show) ]]; then
@@ -278,9 +271,6 @@ __get_docker_container__() {
     else
       pure_compose_status="${BRA_LEFT}${BOLD}${RED}${project_name} ${RED}(down)${BRA_RIGHT}${RESET}"
     fi
-    # else
-    #   pure_compose_status="${YELLOW}${project_name}(?)${RESET}"
-    # fi
   else
     pure_compose_status=""
   fi
@@ -351,20 +341,31 @@ __get_uptime__() {
 
 __update__vars() {
   local err=$? # has to be the first, as it has to evaluate the last command state
-  local CWD DISKSPACE
+
+  local CWD DISKSPACE USERCOLOR
   local info=""
 
-  info="${MAGENTA}${USER}${NC}"
+  if [[ "$USER" == "root" ]]; then
+    USERCOLOR="${RED}${UNDERLINE}"
+  else
+    USERCOLOR="${MAGENTA}"
+  fi
+
+  info="${USERCOLOR}${USER}${NC}"
 
   if $ENABLE_NERDFONTS; then
     local ssh_icon="${GRAY}󰢹 ${NC}"
   fi
 
   # status color for the prompt symbol
-  if ((err <= 0)); then
+  if ((err == 0)); then
     STATUS=${MAGENTA}
   else
-    STATUS=${RED}
+    if $ENABLE_ERROR_CODES; then
+      STATUS="${RED}(${err}) ${MAGENTA}"
+    else
+      STATUS="${RED}"
+    fi
   fi
 
   # current working directory with $HOME replcaed with ~
