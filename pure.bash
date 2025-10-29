@@ -39,9 +39,6 @@ GRAY=$'\e[38;5;239m'
 BOLD=$'\e[1m'
 ITALIC=$'\e[3m'
 UNDERLINE=$'\e[4m'
-BLINK=$'\e[5m'  # May not work in all terminals
-INVERT=$'\e[7m' # Invert foreground/background
-STRIKE=$'\e[9m' # Strikethrough
 
 NC=$'\e[0m' # Reset all styles/colors
 
@@ -63,6 +60,23 @@ fi
 command-exists() {
   command -v "$@" >/dev/null 2>&1
 }
+
+# sanity checks
+if ! command-exists docker; then
+  ENABLE_DOCKER=false
+fi
+
+if ! command-exists git; then
+  ENABLE_GIT=false
+fi
+
+if ! command-exists df; then
+  ENABLE_DISKSPACE=false
+fi
+
+if ! command-exists uptime; then
+  ENABLE_UPTIME=false
+fi
 
 __pure_get_diskspace_icon__() {
   local arg=$1
@@ -313,6 +327,9 @@ __get_uptime__() {
     ut=${ut/up/"${BOLD}${UPTIME_COLOR}up${NC}"}
   fi
 
+  # $ut exists, or return nothing
+  [[ -n "${ut}" ]] || return
+
   # ─< replace the fullname with colored symbols >────────────────────────────────
   # redraw minutes
   ut=${ut/ minutes/"${BOLD}${YELLOW}m${NC}"}
@@ -337,9 +354,6 @@ __get_uptime__() {
   # redraw years
   ut=${ut/ years/"${BOLD}${MAGENTA}Y${NC}"}
   ut=${ut/ year/"${BOLD}${MAGENTA}Y${NC}"}
-
-  # $ut exists, or return nothing
-  [[ -n "${ut}" ]] || return
 
   printf "${BRA_LEFT}%s${BRA_RIGHT}" "${ut}"
 }
