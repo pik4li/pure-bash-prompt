@@ -73,6 +73,7 @@ You can set some settings in the prompt file itself:
 | `ENABLE_DISKSPACE` | `true` | Enables the diskspace widget |
 | `ENABLE_SSH`  | `true` | Enables the ssh detection with hostname prefix for ssh sessions |
 | `ENABLE_UPTIME` | `false` | Enables the uptime widget |
+| `ENABLE_ERROR_CODES` | `true` | Enables the error code display inline |
 
 ## Uninstall
 
