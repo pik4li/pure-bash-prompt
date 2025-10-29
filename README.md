@@ -16,13 +16,13 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 
 > `ENABLE_NERDFONTS=false`
 
-![disk-analyzer "ENABLE_NERDFONTS=false")](assets/disk-analyzer.png)
+![disk-analyzer](assets/disk-analyzer.png "ENABLE_NERDFONTS=false")
 
 ---
 
 > `ENABLE_NERDFONTS=true`
 
-![disk-analyzer-nerdfont "ENABLE_NERDFONTS=true"](assets/disk-analyzer-nerdfont.png)
+![disk-analyzer-nerdfont](assets/disk-analyzer-nerdfont.png "ENABLE_NERDFONTS=true")
 
 ---
 
@@ -30,7 +30,7 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 
 > `ENABLE_ERROR_CODES=true`
 
-![error-code-above-0](assets/error-code-above-0.png)
+![error-code-above-0](assets/error-code-above-0.png "Only shows above 0")
 
 ---
 
