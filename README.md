@@ -10,13 +10,14 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 
 ### **disk-analyzer**:
 
-> has color values for 'above 50%', 'below 50%', and 'below threshhold' <- the
-> threshhold is configurable via a VARIABLE
+> has color values for 'above 33%', 'above 66%', 'above 87%', and 'less'
 >
 > `ENABLE_DISKSPACE=true`
 
 ![disk-analyzer "ENABLE_NERDFONTS=false")](assets/disk-analyzer.png)
 > `ENABLE_NERDFONTS=false`
+
+---
 
 ![disk-analyzer-nerdfont "ENABLE_NERDFONTS=true"](assets/disk-analyzer-nerdfont.png)
 > `ENABLE_NERDFONTS=true`
