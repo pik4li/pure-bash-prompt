@@ -14,7 +14,7 @@ ENABLE_ERROR_CODES=true # set to `false` to disable the error codes inline
 DOCKER_SANITIZE_NAME=false
 
 USER_PROMPT_SYMBOL=""      # you can set a symbol for a prompt here | some other variants..: " "  "" "󰶻 "
-USER_SSH_PROMPT_SYMBOL="󰣀 " # lets you choose a different symbol for ssh connections. If you dont want that, just copy the USER_PROMPT_SYMBOL to this var
+USER_SSH_PROMPT_SYMBOL="󰢹 " # lets you choose a different symbol for ssh connections. If you dont want that, just copy the USER_PROMPT_SYMBOL to this var
 
 # INFO:
 # set custom left and right separators for the widgts like git, docker, diskspace,  uptime..
@@ -52,7 +52,7 @@ if $ENABLE_NERDFONTS; then
   # SSH_ICON_NF="${GRAY} ${NC}"
 
   if [[ -n $SSH_CONNECTION ]]; then
-    __prompt_nerdfont_icon__="${USER_SSH_PROMPT_SYMBOL:-󰢹 }"
+    __prompt_nerdfont_icon__="${USER_SSH_PROMPT_SYMBOL:-${USER_PROMPT_SYMBOL:-}}"
   else
     __prompt_nerdfont_icon__="${USER_PROMPT_SYMBOL:-}"
   fi
