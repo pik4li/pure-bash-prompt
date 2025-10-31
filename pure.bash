@@ -13,7 +13,8 @@ ENABLE_ERROR_CODES=true # set to `false` to disable the error codes inline
 
 DOCKER_SANITIZE_NAME=false
 
-USER_PROMPT_SYMBOL="" # you can set a symbol for a prompt here | some other variants..: " "  "" "󰶻 "
+USER_PROMPT_SYMBOL=""      # you can set a symbol for a prompt here | some other variants..: " "  "" "󰶻 "
+USER_SSH_PROMPT_SYMBOL="󰣀 " # lets you choose a different symbol for ssh connections. If you dont want that, just copy the USER_PROMPT_SYMBOL to this var
 
 # INFO:
 # set custom left and right separators for the widgts like git, docker, diskspace,  uptime..
@@ -48,9 +49,14 @@ BRA_LEFT="${BOLD}${GRAY}${SEPARATOR_LEFT:-[}${NC}"
 BRA_RIGHT="${BOLD}${GRAY}${SEPARATOR_RIGHT:-]}${NC}"
 
 if $ENABLE_NERDFONTS; then
-  SSH_ICON_NF="${GRAY}󰢹 ${NC}"
+  # SSH_ICON_NF="${GRAY} ${NC}"
 
-  __prompt_nerdfont_icon__="${USER_PROMPT_SYMBOL:-}"
+  if $SSH_CONNECTION; then
+    __prompt_nerdfont_icon__="${USER_PROMPT_SYMBOL:-}"
+  else
+    __prompt_nerdfont_icon__="${USER_SSH_PROMPT_SYMBOL:-󰣀 }"
+  fi
+
   PROMPT_SYMBOL="\${STATUS}${__prompt_nerdfont_icon__} ${NC}"
 
   DISKSPACE_ICONS_NF=(󰪞 󰪟 󰪠 󰪡 󰪢 󰪣 󰪤 󰪥)
