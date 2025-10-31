@@ -7,7 +7,7 @@ ENABLE_GIT=true       # set to `false` to disable GIT module
 ENABLE_SSH=true       # set to `false` to disable SSH module
 ENABLE_DOCKER=true    # set to `false` to disable DOCKER module
 ENABLE_DISKSPACE=true # set to `false` to disable DISKSPACE module
-ENABLE_UPTIME=true    # set to `true` to enable UPTIME module
+ENABLE_UPTIME=false   # set to `true` to enable UPTIME module
 
 ENABLE_ERROR_CODES=true   # set to `false` to disable the error codes inline
 INFO_LINE_ON_NEWLINE=true # set to `false` to set the info line next to the user line
