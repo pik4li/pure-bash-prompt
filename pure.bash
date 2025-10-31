@@ -51,17 +51,17 @@ BRA_RIGHT="${BOLD}${GRAY}${SEPARATOR_RIGHT:-]}${NC}"
 if $ENABLE_NERDFONTS; then
   # SSH_ICON_NF="${GRAY} ${NC}"
 
-  if $SSH_CONNECTION; then
-    __prompt_nerdfont_icon__="${USER_PROMPT_SYMBOL:-}"
+  if [[ -n $SSH_CONNECTION ]]; then
+    __prompt_nerdfont_icon__="${USER_SSH_PROMPT_SYMBOL:-󰢹 }"
   else
-    __prompt_nerdfont_icon__="${USER_SSH_PROMPT_SYMBOL:-󰣀 }"
+    __prompt_nerdfont_icon__="${USER_PROMPT_SYMBOL:-}"
   fi
 
   PROMPT_SYMBOL="\${STATUS}${__prompt_nerdfont_icon__} ${NC}"
 
   DISKSPACE_ICONS_NF=(󰪞 󰪟 󰪠 󰪡 󰪢 󰪣 󰪤 󰪥)
 else
-  PROMPT_SYMBOL="\${STATUS}❯ ${NC}"
+  PROMPT_SYMBOL="\${STATUS}${USER_PROMPT_SYMBOL:-❯} ${NC}"
   DISKSPACE_ICONS_NF=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
 fi
 
