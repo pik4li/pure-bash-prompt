@@ -397,7 +397,7 @@ __update__vars() {
   if $ENABLE_SSH; then
     # for ssh connections
     if [[ -n $SSH_CONNECTION ]]; then
-      info="${BOLD}${SSH_ICON_NF}${MAGENTA}${UNDERLINE}${USER}${MAGENTA}@${RED}${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
+      info="${BOLD}${MAGENTA}${USER}${RED}@${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
     else
       info+="${CYAN}:${CWD}${NC}"
     fi
