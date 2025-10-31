@@ -7,9 +7,10 @@ ENABLE_GIT=true       # set to `false` to disable GIT module
 ENABLE_SSH=true       # set to `false` to disable SSH module
 ENABLE_DOCKER=true    # set to `false` to disable DOCKER module
 ENABLE_DISKSPACE=true # set to `false` to disable DISKSPACE module
-ENABLE_UPTIME=false   # set to `true` to enable UPTIME module
+ENABLE_UPTIME=true    # set to `true` to enable UPTIME module
 
-ENABLE_ERROR_CODES=true # set to `false` to disable the error codes inline
+ENABLE_ERROR_CODES=true   # set to `false` to disable the error codes inline
+INFO_LINE_ON_NEWLINE=true # set to `false` to set the info line next to the user line
 
 DOCKER_SANITIZE_NAME=false
 
@@ -370,7 +371,7 @@ __update__vars() {
   local err=$? # has to be the first, as it has to evaluate the last command state
 
   local CWD DISKSPACE USERCOLOR
-  local info=""
+  local info="" user=""
 
   if [[ "$USER" == "root" ]]; then
     USERCOLOR="${RED}${UNDERLINE}"
@@ -378,7 +379,7 @@ __update__vars() {
     USERCOLOR="${MAGENTA}"
   fi
 
-  info="${USERCOLOR}${USER}${NC}"
+  user="${USERCOLOR}${USER}${NC}"
 
   # status color for the prompt symbol
   if ((err == 0)); then
@@ -397,12 +398,12 @@ __update__vars() {
   if $ENABLE_SSH; then
     # for ssh connections
     if [[ -n $SSH_CONNECTION ]]; then
-      info="${BOLD}${MAGENTA}${USER}${RED}@${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
+      user="${BOLD}${MAGENTA}${USER}${RED}@${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
     else
-      info+="${CYAN}:${CWD}${NC}"
+      user+="${CYAN}:${CWD}${NC}"
     fi
   else
-    info+="${CYAN}:${CWD}${NC}"
+    user+="${CYAN}:${CWD}${NC}"
   fi
 
   if $ENABLE_DOCKER; then
@@ -419,7 +420,7 @@ __update__vars() {
   if $ENABLE_DISKSPACE; then
     DISKSPACE="$(__get_diskspace__)"
 
-    info+=" ${DISKSPACE}"
+    info+="${DISKSPACE}"
   fi
 
   if $ENABLE_GIT; then
@@ -435,7 +436,11 @@ __update__vars() {
     info+=" ${UPTIME}"
   fi
 
-  INFO_LINE="${info}"
+  if $INFO_LINE_ON_NEWLINE; then
+    INFO_LINE=${info}$'\n'${user}
+  else
+    INFO_LINE="${user} ${info}"
+  fi
 }
 
 PROMPT_COMMAND="__update__vars; ${PROMPT_COMMAND}"
