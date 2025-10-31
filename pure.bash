@@ -13,6 +13,8 @@ ENABLE_ERROR_CODES=true # set to `false` to disable the error codes inline
 
 DOCKER_SANITIZE_NAME=false
 
+USER_PROMPT_SYMBOL="" # you can set a symbol for a prompt here | some other variants..: " "  "" "󰶻 "
+
 # INFO:
 # set custom left and right separators for the widgts like git, docker, diskspace,  uptime..
 # you can for example set ( and ) | Default is [ and ]
@@ -48,7 +50,7 @@ BRA_RIGHT="${BOLD}${GRAY}${SEPARATOR_RIGHT:-]}${NC}"
 if $ENABLE_NERDFONTS; then
   SSH_ICON_NF="${GRAY}󰢹 ${NC}"
 
-  __prompt_nerdfont_icon__="" # some other variants..: " "  "" "󰶻 "
+  __prompt_nerdfont_icon__="${USER_PROMPT_SYMBOL:-}"
   PROMPT_SYMBOL="\${STATUS}${__prompt_nerdfont_icon__} ${NC}"
 
   DISKSPACE_ICONS_NF=(󰪞 󰪟 󰪠 󰪡 󰪢 󰪣 󰪤 󰪥)
