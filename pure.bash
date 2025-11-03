@@ -122,6 +122,42 @@ __get_diskspace__() {
     printf "${BRA_LEFT}${BOLD}${GREEN}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
   fi
 }
+__get_remote_status__() {
+  local pure_git_raw_remote_status
+  local UNPULLED
+
+  pure_git_raw_remote_status=$(git status --porcelain=2 --branch | command grep --only-matching --perl-regexp '\+\d+ \-\d+')
+
+  # shape raw status and check unpulled commit
+  UNPULLED=$(echo ${pure_git_raw_remote_status} | command grep --only-matching --perl-regexp '\-\d')
+  if [[ ${UNPULLED} != "-0" ]]; then
+    pure_git_unpulled=true
+  else
+    pure_git_unpulled=false
+  fi
+
+  # unpushed commit too
+  UNPUSHED=$(echo ${pure_git_raw_remote_status} | command grep --only-matching --perl-regexp '\+\d')
+  if [[ ${UNPUSHED} != "+0" ]]; then
+    pure_git_unpushed=true
+  else
+    pure_git_unpushed=false
+  fi
+
+  # if unpulled -> ⇣
+  # if unpushed -> ⇡
+  # if both (branched from remote) -> ⇣⇡
+  if ${pure_git_unpulled}; then
+    if ${pure_git_unpushed}; then
+      printf "%s" "${RED}${pure_symbol_unpulled}${pure_symbol_unpushed}${NC}"
+    else
+      printf "%s" "${BOLD}${RED}${pure_symbol_unpulled}${NC}"
+    fi
+
+  elif ${pure_git_unpushed}; then
+    printf "%s" "${BOLD}${BLUE}${pure_symbol_unpushed}${NC}"
+  fi
+}
 
 __get_git_status__() {
   local git_status=""
@@ -129,43 +165,6 @@ __get_git_status__() {
   pure_symbol_unpulled="${BOLD}${BLUE} ⇣${NC}"
   pure_symbol_unpushed="${BOLD}${MAGENTA} ⇡${NC}"
   pure_symbol_dirty="${BOLD}${RED} *${NC}"
-
-  __get_remote_status__() {
-    local pure_git_raw_remote_status
-    local UNPULLED
-
-    pure_git_raw_remote_status=$(git status --porcelain=2 --branch | command grep --only-matching --perl-regexp '\+\d+ \-\d+')
-
-    # shape raw status and check unpulled commit
-    UNPULLED=$(echo ${pure_git_raw_remote_status} | command grep --only-matching --perl-regexp '\-\d')
-    if [[ ${UNPULLED} != "-0" ]]; then
-      pure_git_unpulled=true
-    else
-      pure_git_unpulled=false
-    fi
-
-    # unpushed commit too
-    UNPUSHED=$(echo ${pure_git_raw_remote_status} | command grep --only-matching --perl-regexp '\+\d')
-    if [[ ${UNPUSHED} != "+0" ]]; then
-      pure_git_unpushed=true
-    else
-      pure_git_unpushed=false
-    fi
-
-    # if unpulled -> ⇣
-    # if unpushed -> ⇡
-    # if both (branched from remote) -> ⇣⇡
-    if ${pure_git_unpulled}; then
-      if ${pure_git_unpushed}; then
-        printf "%s" "${RED}${pure_symbol_unpulled}${pure_symbol_unpushed}${NC}"
-      else
-        printf "%s" "${BOLD}${RED}${pure_symbol_unpulled}${NC}"
-      fi
-
-    elif ${pure_git_unpushed}; then
-      printf "%s" "${BOLD}${BLUE}${pure_symbol_unpushed}${NC}"
-    fi
-  }
 
   # if current directory isn't git repository, skip this
   if [[ $(git rev-parse --is-inside-work-tree 2>/dev/null) == "true" ]]; then
@@ -193,6 +192,7 @@ __get_git_status__() {
 
     # if repository have no remote, skip this
     if [[ -n $(git remote show) ]]; then
+      # git_status+="$(__get_remote_status__)"
       git_status+="$(__get_remote_status__)"
     fi
   fi
@@ -367,19 +367,77 @@ __get_uptime__() {
   printf "${BRA_LEFT}%s${BRA_RIGHT}" "${ut}"
 }
 
-__update__vars() {
-  local err=$? # has to be the first, as it has to evaluate the last command state
+__setup_info_bar__() {
+  local -n ptr=${1}
+  local container
+  local user="" info=""
 
-  local CWD DISKSPACE USERCOLOR
-  local info="" user=""
+  local CWD USERCOLOR
 
   if [[ "$USER" == "root" ]]; then
-    USERCOLOR="${RED}${UNDERLINE}"
+    USERCOLOR=${RED}${BOLD}
   else
-    USERCOLOR="${MAGENTA}"
+    USERCOLOR=${MAGENTA}
   fi
 
   user="${USERCOLOR}${USER}${NC}"
+
+  # current working directory with $HOME replcaed with ~
+  CWD=${PWD/"$HOME"/"~"}
+
+  if $ENABLE_SSH; then
+    # for ssh connections
+    if [[ -n $SSH_CONNECTION ]]; then
+      user="${BOLD}${USERCOLOR}${USER}${RED}@${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
+    else
+      user+="${CYAN}:${CWD}${NC}"
+    fi
+  else
+    user+="${CYAN}:${CWD}${NC}"
+  fi
+
+  MODULES=()
+
+  if $ENABLE_DOCKER; then
+    container=$(__get_docker_container__)
+
+    if [[ -n "${container}" ]]; then
+      info+=${container}$'\n'
+    fi
+  fi
+
+  # first goes to the left
+  if $ENABLE_DISKSPACE; then
+    MODULES+=("$(__get_diskspace__)")
+  fi
+  # every other module goes right nextto it
+
+  if $ENABLE_GIT; then
+    MODULES+=("$(__get_git_status__)")
+  fi
+
+  if $ENABLE_UPTIME; then
+    MODULES+=("$(__get_uptime__)")
+  fi
+
+  for m in "${MODULES[@]}"; do
+    [[ -n "${m}" ]] || continue
+
+    info+="${m} "
+  done
+
+  info=${info%" "}
+
+  if $INFO_LINE_ON_NEWLINE; then
+    info=${info}$'\n'
+    ptr=${info}${user}
+  else
+    ptr="${user} ${info}"
+  fi
+}
+
+__update__vars() {
+  local err=$? # has to be the first, as it has to evaluate the last command state
 
   # status color for the prompt symbol
   if ((err == 0)); then
@@ -392,55 +450,7 @@ __update__vars() {
     fi
   fi
 
-  # current working directory with $HOME replcaed with ~
-  CWD=${PWD/"$HOME"/"~"}
-
-  if $ENABLE_SSH; then
-    # for ssh connections
-    if [[ -n $SSH_CONNECTION ]]; then
-      user="${BOLD}${MAGENTA}${USER}${RED}@${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
-    else
-      user+="${CYAN}:${CWD}${NC}"
-    fi
-  else
-    user+="${CYAN}:${CWD}${NC}"
-  fi
-
-  if $ENABLE_DOCKER; then
-    if [[ -n "$(__get_docker_container__)" ]]; then
-      DOCKER_LINE=$(__get_docker_container__)$'\n'
-      info="${DOCKER_LINE}${info}"
-    else
-      DOCKER_LINE=""
-    fi
-  else
-    DOCKER_LINE=""
-  fi
-
-  if $ENABLE_DISKSPACE; then
-    DISKSPACE="$(__get_diskspace__)"
-
-    info+="${DISKSPACE}"
-  fi
-
-  if $ENABLE_GIT; then
-    GIT_STATUS="$(__get_git_status__)"
-
-    [[ -n "$GIT_STATUS" ]] &&
-      info+=" ${GIT_STATUS}"
-  fi
-
-  if $ENABLE_UPTIME; then
-    UPTIME="$(__get_uptime__)"
-
-    info+=" ${UPTIME}"
-  fi
-
-  if $INFO_LINE_ON_NEWLINE; then
-    INFO_LINE=${info}$'\n'${user}
-  else
-    INFO_LINE="${user} ${info}"
-  fi
+  __setup_info_bar__ INFO_LINE
 }
 
 PROMPT_COMMAND="__update__vars; ${PROMPT_COMMAND}"
