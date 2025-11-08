@@ -6,13 +6,17 @@ ENABLE_NERDFONTS=true # set to `false` if you do not have nerdfonts installed
 ENABLE_GIT=true       # set to `false` to disable GIT module
 ENABLE_SSH=true       # set to `false` to disable SSH module
 ENABLE_DOCKER=true    # set to `false` to disable DOCKER module
+ENABLE_YAZI=true      # set to `false` to enable YAZI module
 ENABLE_DISKSPACE=true # set to `false` to disable DISKSPACE module
-ENABLE_UPTIME=false   # set to `true` to enable UPTIME module
+ENABLE_UPTIME=false   # set to `true`  to enable UPTIME module
 
 ENABLE_ERROR_CODES=true   # set to `false` to disable the error codes inline
 INFO_LINE_ON_NEWLINE=true # set to `false` to set the info line next to the user line
 
 DOCKER_SANITIZE_NAME=false
+
+# INFO:
+# You can set different symbols for your prompts (ssh and normal) if you'd like to
 
 USER_PROMPT_SYMBOL=""      # you can set a symbol for a prompt here | some other variants..: " "  "" "󰶻 "
 USER_SSH_PROMPT_SYMBOL="󰢹 " # lets you choose a different symbol for ssh connections. If you dont want that, just copy the USER_PROMPT_SYMBOL to this var
@@ -20,12 +24,14 @@ USER_SSH_PROMPT_SYMBOL="󰢹 " # lets you choose a different symbol for ssh conn
 # INFO:
 # set custom left and right separators for the widgts like git, docker, diskspace,  uptime..
 # you can for example set ( and ) | Default is [ and ]
-#
+
 # SEPARATOR_LEFT="("
 # SEPARATOR_RIGHT=")"
 
 ## CAUTION:
+## --------------------------------------------------------------------------
 ## Do not edit anything beyond this line, unless you know what you are doing!
+## --------------------------------------------------------------------------
 
 # Basic Colors
 BLACK=$'\e[30m'
@@ -66,6 +72,7 @@ else
   DISKSPACE_ICONS_NF=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
 fi
 
+# helper function
 command-exists() {
   command -v "$@" >/dev/null 2>&1
 }
@@ -451,7 +458,14 @@ __update__vars() {
   fi
 
   __setup_info_bar__ INFO_LINE
+
+  if $ENABLE_YAZI; then
+    YAZI_TERM=""
+    if [ -n "$YAZI_LEVEL" ]; then
+      YAZI_TERM="${BOLD}${RED} |  Yazi terminal:${NC} "
+    fi
+  fi
 }
 
 PROMPT_COMMAND="__update__vars; ${PROMPT_COMMAND}"
-PS1="\n\${INFO_LINE}\n${PROMPT_SYMBOL}"
+PS1="\n\${INFO_LINE}\${YAZI_TERM}\n${PROMPT_SYMBOL}"
