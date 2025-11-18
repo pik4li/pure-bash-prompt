@@ -94,6 +94,10 @@ if ! command-exists uptime; then
   ENABLE_UPTIME=false
 fi
 
+if ! command-exists yazi; then
+  ENABLE_YAZI=false
+fi
+
 __pure_get_diskspace_icon__() {
   local arg=$1
 

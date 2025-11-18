@@ -71,14 +71,16 @@ You can set some settings in the prompt file itself:
 
 | key | default_value | properties |
 | - | - | - |
-| `ENABLE_NERDFONTS` | `true` | Enables or disables [nerdfonts](https://www.nerdfonts.com/font-downloads) in all widgets |
+| `ENABLE_DISKSPACE` | `true` | Enables the diskspace widget |
 | `ENABLE_DOCKER` | `true` | Enables or disables the docker widget |
 | `DOCKER_SANITIZE_NAME` | `false` | Enables or disables the docker project name sanitization |
+| `ENABLE_ERROR_CODES` | `true` | Enables the error code display inline |
 | `ENABLE_GIT` | `true` | Enables or disables the git widget |
-| `ENABLE_DISKSPACE` | `true` | Enables the diskspace widget |
+| `ENABLE_NERDFONTS` | `true` | Enables or disables [nerdfonts](https://www.nerdfonts.com/font-downloads) in all widgets |
 | `ENABLE_SSH`  | `true` | Enables the ssh detection with hostname prefix for ssh sessions |
 | `ENABLE_UPTIME` | `false` | Enables the uptime widget |
-| `ENABLE_ERROR_CODES` | `true` | Enables the error code display inline |
+| `ENABLE_YAZI` | `true` (when yazi is installed) | Displays an indicator if inside a yazi spawned sub-shell |
+| `INFO_LINE_ON_NEWLINE` | `true` | Displays the information (diskspace, uptime, yazi) onto a separate line below the docker-line. Set to `false` to disable |
 
 ## Uninstall
 
