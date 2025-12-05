@@ -18,7 +18,7 @@ DOCKER_SANITIZE_NAME=false
 # INFO:
 # You can set different symbols for your prompts (ssh and normal) if you'd like to
 
-USER_PROMPT_SYMBOL=""      # you can set a symbol for a prompt here | some other variants..: " "  "" "󰶻 "
+USER_PROMPT_SYMBOL=""      # you can set a symbol for a prompt here | some other variants..: "¶" " "  "" "󰶻 "
 USER_SSH_PROMPT_SYMBOL="󰢹 " # lets you choose a different symbol for ssh connections. If you dont want that, just copy the USER_PROMPT_SYMBOL to this var
 
 # INFO:
