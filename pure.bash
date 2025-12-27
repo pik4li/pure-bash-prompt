@@ -1,25 +1,29 @@
 # ╭────────────╮
 # │  Settings  │
 # ╰────────────╯
-ENABLE_NERDFONTS=true # set to `false` if you do not have nerdfonts installed
+PURE_CONFIG_FILE="${HOME}/.purerc"
 
-ENABLE_GIT=true       # set to `false` to disable GIT module
-ENABLE_SSH=true       # set to `false` to disable SSH module
-ENABLE_DOCKER=true    # set to `false` to disable DOCKER module
-ENABLE_YAZI=true      # set to `false` to enable YAZI module
-ENABLE_DISKSPACE=true # set to `false` to disable DISKSPACE module
-ENABLE_UPTIME=false   # set to `true`  to enable UPTIME module
+[[ -e "${PURE_CONFIG_FILE}" ]] &&
+  . "${PURE_CONFIG_FILE}" # source the config file if it exists.
 
-ENABLE_ERROR_CODES=true   # set to `false` to disable the error codes inline
-INFO_LINE_ON_NEWLINE=true # set to `false` to set the info line next to the user line
+: "${ENABLE_NERDFONTS:=true}" # set to `false` if you do not have nerdfonts installed
+: "${ENABLE_GIT:=true}"       # set to `false` to disable GIT module
+: "${ENABLE_SSH:=true}"       # set to `false` to disable SSH module
+: "${ENABLE_DOCKER:=true}"    # set to `false` to disable DOCKER module
+: "${ENABLE_YAZI:=true}"      # set to `false` to enable YAZI module
+: "${ENABLE_DISKSPACE:=true}" # set to `false` to disable DISKSPACE module
+: "${ENABLE_UPTIME:=false}"   # set to `true`  to enable UPTIME module
 
-DOCKER_SANITIZE_NAME=false
+: "${ENABLE_ERROR_CODES:=true}"   # set to `false` to disable the error codes inline
+: "${INFO_LINE_ON_NEWLINE:=true}" # set to `false` to set the info line next to the user line
+
+: "${DOCKER_SANITIZE_NAME:=false}"
 
 # INFO:
 # You can set different symbols for your prompts (ssh and normal) if you'd like to
 
-USER_PROMPT_SYMBOL=""      # you can set a symbol for a prompt here | some other variants..: "¶" " "  "" "󰶻 "
-USER_SSH_PROMPT_SYMBOL="󰢹 " # lets you choose a different symbol for ssh connections. If you dont want that, just copy the USER_PROMPT_SYMBOL to this var
+: "${USER_PROMPT_SYMBOL:=""}"     # you can set a symbol for a prompt here | some other variants..: "¶" " "  "" "󰶻 "
+: "${USER_SSH_PROMPT_SYMBOL:="󰢹"}" # lets you choose a different symbol for ssh connections. If you dont want that, just copy the USER_PROMPT_SYMBOL to this var
 
 # INFO:
 # set custom left and right separators for the widgts like git, docker, diskspace,  uptime..
@@ -78,24 +82,34 @@ command-exists() {
 }
 
 # sanity checks
-if ! command-exists docker; then
-  ENABLE_DOCKER=false
+if $ENABLE_DOCKER; then
+  if ! command-exists docker; then
+    ENABLE_DOCKER=false
+  fi
 fi
 
-if ! command-exists git; then
-  ENABLE_GIT=false
+if $ENABLE_GIT; then
+  if ! command-exists git; then
+    ENABLE_GIT=false
+  fi
 fi
 
-if ! command-exists df; then
-  ENABLE_DISKSPACE=false
+if $ENABLE_DISKSPACE; then
+  if ! command-exists df; then
+    ENABLE_DISKSPACE=false
+  fi
 fi
 
-if ! command-exists uptime; then
-  ENABLE_UPTIME=false
+if $ENABLE_UPTIME; then
+  if ! command-exists uptime; then
+    ENABLE_UPTIME=false
+  fi
 fi
 
-if ! command-exists yazi; then
-  ENABLE_YAZI=false
+if $ENABLE_YAZI; then
+  if ! command-exists yazi; then
+    ENABLE_YAZI=false
+  fi
 fi
 
 __pure_get_diskspace_icon__() {

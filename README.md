@@ -55,7 +55,7 @@ Inspired by [krashikiworks/pure-prompt-bash](https://github.com/krashikiworks/pu
 
 </details>
 
-## Install
+## install
 
 just clone this repository (or just copy pure.bash) anywhere, and add
 
@@ -65,7 +65,18 @@ source /path/to/pure.bash
 
 to your `.bashrc`
 
+## configuration
+
+You can configure your pure prompt with a file located at `~/.purerc`
+
+There you can change all the [settings](#variables)
+
+I've provided a `example.purerc` to get you started. You do not need that, as
+all variables have some defaults.
+
 ## settings
+
+#### variables
 
 You can set some settings in the prompt file itself:
 

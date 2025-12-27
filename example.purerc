@@ -1,0 +1,19 @@
+ENABLE_NERDFONTS=true # set to `false` if you do not have nerdfonts installed
+
+ENABLE_GIT=true       # set to `false` to disable GIT module
+ENABLE_SSH=true       # set to `false` to disable SSH module
+ENABLE_DOCKER=true    # set to `false` to disable DOCKER module
+ENABLE_YAZI=true      # set to `false` to enable YAZI module
+ENABLE_DISKSPACE=true # set to `false` to disable DISKSPACE module
+ENABLE_UPTIME=false   # set to `true`  to enable UPTIME module
+
+ENABLE_ERROR_CODES=true   # set to `false` to disable the error codes inline
+INFO_LINE_ON_NEWLINE=true # set to `false` to set the info line next to the user line
+
+DOCKER_SANITIZE_NAME=false
+
+USER_PROMPT_SYMBOL=""      # you can set a symbol for a prompt here | some other variants..: "¶" " "  "" "󰶻 "
+USER_SSH_PROMPT_SYMBOL="󰢹 " # lets you choose a different symbol for ssh connections. If you dont want that, just copy the USER_PROMPT_SYMBOL to this var
+
+# SEPARATOR_LEFT="("  # default it [
+# SEPARATOR_RIGHT=")" # default it ]
