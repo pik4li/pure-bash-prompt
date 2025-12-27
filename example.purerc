@@ -1,3 +1,4 @@
+# vim: ft=bash
 ENABLE_NERDFONTS=true # set to `false` if you do not have nerdfonts installed
 
 ENABLE_GIT=true       # set to `false` to disable GIT module
