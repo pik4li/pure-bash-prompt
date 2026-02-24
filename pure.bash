@@ -137,11 +137,11 @@ __get_diskspace__() {
 
   icon=$(__pure_get_diskspace_icon__ "${perc}")
 
-  if ((perc >= 85)); then
+  if ((perc >= 88)); then
     printf "${BRA_LEFT}${BOLD}${RED}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
-  elif ((perc >= 67)); then
+  elif ((perc >= 75)); then
     printf "${BRA_LEFT}${BOLD}${ORANGE}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
-  elif ((perc >= 34)); then
+  elif ((perc >= 44)); then
     printf "${BRA_LEFT}${BOLD}${YELLOW}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
   else
     printf "${BRA_LEFT}${BOLD}${GREEN}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
