@@ -510,5 +510,3 @@ __update__vars() {
 
 PROMPT_COMMAND="__update__vars; ${PROMPT_COMMAND}"
 PS1="\n\${INFO_LINE}\${YAZI_TERM}\n${PROMPT_SYMBOL}"
-
-echo "${PURE[green]}Hey this is green!${PURE[nc]}" >&2
