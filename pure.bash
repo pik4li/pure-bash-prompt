@@ -54,7 +54,7 @@ declare -Ag PURE=(
 
 case "$PURE_THEME" in
 tokyonight)
-  PURE=(
+  PURE+=(
     ["grey"]=$'\e[38;5;239m'
     ["black"]=$'\e[38;2;7;11;20m'       # #070B14 (bg/darker)
     ["red"]=$'\e[38;2;255;85;119m'      # #FF5577 (red/pink)
@@ -67,7 +67,7 @@ tokyonight)
   )                                     # the tokyonight colors
   ;;
 gruvbox)
-  PURE=(
+  PURE+=(
     ["grey"]=$'\e[38;5;239m'
     ["black"]=$'\e[38;2;40;40;40m'     # #282828
     ["red"]=$'\e[38;2;204;36;29m'      # #CC241D
