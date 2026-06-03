@@ -1,3 +1,4 @@
+# vim:ft=sh
 # ╭────────────╮
 # │  Settings  │
 # ╰────────────╯
@@ -37,42 +38,64 @@ PURE_CONFIG_FILE="${HOME}/.purerc"
 ## Do not edit anything beyond this line, unless you know what you are doing!
 ## --------------------------------------------------------------------------
 
-# Basic Colors
-BLACK=$'\e[30m'
-RED=$'\e[31m'
-GREEN=$'\e[32m'
-YELLOW=$'\e[33m'
-ORANGE=$'\e[38;5;202m'
-BLUE=$'\e[34m'
-MAGENTA=$'\e[35m'
-CYAN=$'\e[36m'
-WHITE=$'\e[37m'
-GRAY=$'\e[38;5;239m'
+: "${PURE_THEME:=gruvbox}"
+declare -Ag PURE=(
+  ["bold"]=$'\e[1m'
+  ["bolt"]=$'\e[1m'
+  ["italic"]=$'\e[3m'
+  ["blink"]=$'\e[5m'
+  ["underline"]=$'\e[4m'
+  ["undercurl"]=$'\e[4m'
+  ["strike"]=$'\e[9m'
+  ["invert"]=$'\e[7m'
+  ["reset"]=$'\e[0m'
+  ["nc"]=$'\e[0m'
+) # for echo and stuff (ansi sequences)
 
-# Styles
-BOLD=$'\e[1m'
-ITALIC=$'\e[3m'
-UNDERLINE=$'\e[4m'
+case "$PURE_THEME" in
+tokyonight)
+  PURE=(
+    ["grey"]=$'\e[38;5;239m'
+    ["black"]=$'\e[38;2;7;11;20m'       # #070B14 (bg/darker)
+    ["red"]=$'\e[38;2;255;85;119m'      # #FF5577 (red/pink)
+    ["green"]=$'\e[38;2;99;191;132m'    # #63BF84 (green)
+    ["yellow"]=$'\e[38;2;255;199;120m'  # #FFC778 (yellow)
+    ["blue"]=$'\e[38;2;124;160;255m'    # #7CA0FF (blue)
+    ["magenta"]=$'\e[38;2;212;162;255m' # #D4A2FF (magenta/purple)
+    ["cyan"]=$'\e[38;2;139;199;225m'    # #8BC7E1 (cyan)
+    ["white"]=$'\e[38;2;197;203;215m'   # #C5CBD7 (foreground/light)
+  )                                     # the tokyonight colors
+  ;;
+gruvbox)
+  PURE=(
+    ["grey"]=$'\e[38;5;239m'
+    ["black"]=$'\e[38;2;40;40;40m'     # #282828
+    ["red"]=$'\e[38;2;204;36;29m'      # #CC241D
+    ["green"]=$'\e[38;2;152;151;26m'   # #98971A
+    ["yellow"]=$'\e[38;2;215;153;33m'  # #D79921
+    ["blue"]=$'\e[38;2;69;133;136m'    # #458383
+    ["magenta"]=$'\e[38;2;177;98;134m' # #B16286
+    ["cyan"]=$'\e[38;2;104;157;106m'   # #688D6A
+    ["white"]=$'\e[38;2;235;219;178m'  # #EBDBB2 (foreground/light)
+  )                                    # the gruvbox colors
+  ;;
+esac
 
-NC=$'\e[0m' # Reset all styles/colors
-
-BRA_LEFT="${BOLD}${GRAY}${SEPARATOR_LEFT:-[}${NC}"
-BRA_RIGHT="${BOLD}${GRAY}${SEPARATOR_RIGHT:-]}${NC}"
+BRA_LEFT="${PURE[bold]}${PURE[grey]}${SEPARATOR_LEFT:-"["}${PURE[nc]}"
+BRA_RIGHT="${PURE[bold]}${PURE[grey]}${SEPARATOR_RIGHT:-"]"}${PURE[nc]}"
 
 if $ENABLE_NERDFONTS; then
-  # SSH_ICON_NF="${GRAY} ${NC}"
-
   if [[ -n $SSH_CONNECTION ]]; then
     __prompt_nerdfont_icon__="${USER_SSH_PROMPT_SYMBOL:-${USER_PROMPT_SYMBOL:-}}"
   else
     __prompt_nerdfont_icon__="${USER_PROMPT_SYMBOL:-}"
   fi
 
-  PROMPT_SYMBOL="\${STATUS}${__prompt_nerdfont_icon__} ${NC}"
+  PROMPT_SYMBOL="\${STATUS}${__prompt_nerdfont_icon__} ${PURE[nc]}"
 
   DISKSPACE_ICONS_NF=(󰪞 󰪟 󰪠 󰪡 󰪢 󰪣 󰪤 󰪥)
 else
-  PROMPT_SYMBOL="\${STATUS}${USER_PROMPT_SYMBOL:-❯} ${NC}"
+  PROMPT_SYMBOL="\${STATUS}${USER_PROMPT_SYMBOL:-❯} ${PURE[nc]}"
   DISKSPACE_ICONS_NF=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
 fi
 
@@ -138,13 +161,13 @@ __get_diskspace__() {
   icon=$(__pure_get_diskspace_icon__ "${perc}")
 
   if ((perc >= 88)); then
-    printf "${BRA_LEFT}${BOLD}${RED}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
+    printf "${BRA_LEFT}${PURE[bold]}${PURE[red]}${icon:-}%s${PURE[nc]}${BRA_RIGHT}" "${space}${unit}"
   elif ((perc >= 75)); then
-    printf "${BRA_LEFT}${BOLD}${ORANGE}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
+    printf "${BRA_LEFT}${PURE[bold]}${PURE[magenta]}${icon:-}%s${PURE[nc]}${BRA_RIGHT}" "${space}${unit}"
   elif ((perc >= 44)); then
-    printf "${BRA_LEFT}${BOLD}${YELLOW}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
+    printf "${BRA_LEFT}${PURE[bold]}${PURE[yellow]}${icon:-}%s${PURE[nc]}${BRA_RIGHT}" "${space}${unit}"
   else
-    printf "${BRA_LEFT}${BOLD}${GREEN}${icon:-}%s${NC}${BRA_RIGHT}" "${space}${unit}"
+    printf "${BRA_LEFT}${PURE[bold]}${PURE[green]}${icon:-}%s${PURE[nc]}${BRA_RIGHT}" "${space}${unit}"
   fi
 }
 __get_remote_status__() {
@@ -174,22 +197,22 @@ __get_remote_status__() {
   # if both (branched from remote) -> ⇣⇡
   if ${pure_git_unpulled}; then
     if ${pure_git_unpushed}; then
-      printf "%s" "${RED}${pure_symbol_unpulled}${pure_symbol_unpushed}${NC}"
+      printf "%s" "${PURE[red]}${pure_symbol_unpulled}${pure_symbol_unpushed}${PURE[nc]}"
     else
-      printf "%s" "${BOLD}${RED}${pure_symbol_unpulled}${NC}"
+      printf "%s" "${PURE[bold]}${PURE[red]}${pure_symbol_unpulled}${PURE[nc]}"
     fi
 
   elif ${pure_git_unpushed}; then
-    printf "%s" "${BOLD}${BLUE}${pure_symbol_unpushed}${NC}"
+    printf "%s" "${PURE[bold]}${PURE[blue]}${pure_symbol_unpushed}${PURE[nc]}"
   fi
 }
 
 __get_git_status__() {
   local git_status=""
 
-  pure_symbol_unpulled="${BOLD}${BLUE} ⇣${NC}"
-  pure_symbol_unpushed="${BOLD}${MAGENTA} ⇡${NC}"
-  pure_symbol_dirty="${BOLD}${RED} *${NC}"
+  pure_symbol_unpulled="${PURE[bold]}${PURE[blue]} ⇣${PURE[nc]}"
+  pure_symbol_unpushed="${PURE[bold]}${PURE[magenta]} ⇡${PURE[nc]}"
+  pure_symbol_dirty="${PURE[bold]}${PURE[red]} *${PURE[nc]}"
 
   # if current directory isn't git repository, skip this
   if [[ $(git rev-parse --is-inside-work-tree 2>/dev/null) == "true" ]]; then
@@ -210,7 +233,7 @@ __get_git_status__() {
     fi
 
     # coloring
-    git_status="${GRAY}${git_status}${NC}"
+    git_status="${PURE[grey]}${git_status}${PURE[nc]}"
 
     # check clean/dirty
     git_status="${git_status}${diff}"
@@ -284,7 +307,7 @@ __get_docker_container__() {
   local service temp_compose_status
 
   if $ENABLE_NERDFONTS; then
-    local icon="${BLUE} ${NC}"
+    local icon="${PURE[blue]} ${PURE[nc]}"
   fi
 
   # walk up until root to find docker-compose.yml or compose.yml
@@ -316,13 +339,13 @@ __get_docker_container__() {
       # if [[ $(docker compose -f "$compose_file" ps --status running --services 2>/dev/null | wc -l) -gt 0 ]]; then
       for service in "${docker_compose_services[@]}"; do
         service=$(__sanitize_docker_project_name__ "${service}")
-        temp_compose_status+="${BRA_LEFT}${BLUE}${service} ${BOLD}${GREEN}(up)${BRA_RIGHT}${RESET} " # keep the space to space out the projects
+        temp_compose_status+="${BRA_LEFT}${PURE[blue]}${service} ${PURE[bold]}${GREEN}(up)${BRA_RIGHT}${RESET} " # keep the space to space out the projects
       done
 
       [[ -n "${temp_compose_status}" ]] &&
         pure_compose_status=${temp_compose_status}
     else
-      pure_compose_status="${BRA_LEFT}${BOLD}${RED}${project_name} ${RED}(down)${BRA_RIGHT}${RESET}"
+      pure_compose_status="${BRA_LEFT}${PURE[bold]}${PURE[red]}${project_name} ${PURE[red]}(down)${BRA_RIGHT}${RESET}"
     fi
   else
     pure_compose_status=""
@@ -340,25 +363,25 @@ __get_uptime__() {
   ut=${ut//, /" "}
 
   if grep -qi "year" <<<"${ut}"; then
-    UPTIME_COLOR=${MAGENTA}
+    UPTIME_COLOR=${PURE[magenta]}
   elif grep -qi "months" <<<"${ut}"; then
-    UPTIME_COLOR=${BLUE}
+    UPTIME_COLOR=${PURE[blue]}
   elif grep -qi "week" <<<"${ut}"; then
-    UPTIME_COLOR=${CYAN}
+    UPTIME_COLOR=${PURE[cyan]}
   elif grep -qi "day" <<<"${ut}"; then
-    UPTIME_COLOR=${RED}
+    UPTIME_COLOR=${PURE[red]}
   elif grep -qi "hour" <<<"${ut}"; then
     UPTIME_COLOR=${ORANGE}
   elif grep -qi "minute" <<<"${ut}"; then
-    UPTIME_COLOR=${YELLOW}
+    UPTIME_COLOR=${PURE[yellow]}
   else
-    UPTIME_COLOR=${GRAY}
+    UPTIME_COLOR=${PURE[grey]}
   fi
 
   if $ENABLE_NERDFONTS; then
-    ut=${ut/up /"${BOLD}${UPTIME_COLOR}󰔛 ${NC}"}
+    ut=${ut/up /"${PURE[bold]}${UPTIME_COLOR}󰔛 ${PURE[nc]}"}
   else
-    ut=${ut/up/"${BOLD}${UPTIME_COLOR}up${NC}"}
+    ut=${ut/up/"${PURE[bold]}${UPTIME_COLOR}up${PURE[nc]}"}
   fi
 
   # $ut exists, or return nothing
@@ -366,28 +389,28 @@ __get_uptime__() {
 
   # ─< replace the fullname with colored symbols >────────────────────────────────
   # redraw minutes
-  ut=${ut/ minutes/"${BOLD}${YELLOW}m${NC}"}
-  ut=${ut/ minute/"${BOLD}${YELLOW}m${NC}"}
+  ut=${ut/ minutes/"${PURE[bold]}${PURE[yellow]}m${PURE[nc]}"}
+  ut=${ut/ minute/"${PURE[bold]}${PURE[yellow]}m${PURE[nc]}"}
 
   # redraw hours
-  ut=${ut/ hours/"${BOLD}${ORANGE}h${NC}"}
-  ut=${ut/ hour/"${BOLD}${ORANGE}h${NC}"}
+  ut=${ut/ hours/"${PURE[bold]}${ORANGE}h${PURE[nc]}"}
+  ut=${ut/ hour/"${PURE[bold]}${ORANGE}h${PURE[nc]}"}
 
   # redraw days
-  ut=${ut/ days/"${BOLD}${RED}d${NC}"}
-  ut=${ut/ day/"${BOLD}${RED}d${NC}"}
+  ut=${ut/ days/"${PURE[bold]}${PURE[red]}d${PURE[nc]}"}
+  ut=${ut/ day/"${PURE[bold]}${PURE[red]}d${PURE[nc]}"}
 
   # redraw weeks
-  ut=${ut/ weeks/"${BOLD}${CYAN}W${NC}"}
-  ut=${ut/ week/"${BOLD}${CYAN}W${NC}"}
+  ut=${ut/ weeks/"${PURE[bold]}${PURE[cyan]}W${PURE[nc]}"}
+  ut=${ut/ week/"${PURE[bold]}${PURE[cyan]}W${PURE[nc]}"}
 
   # redraw months
-  ut=${ut/ months/"${BOLD}${BLUE}M${NC}"}
-  ut=${ut/ month/"${BOLD}${BLUE}M${NC}"}
+  ut=${ut/ months/"${PURE[bold]}${PURE[blue]}M${PURE[nc]}"}
+  ut=${ut/ month/"${PURE[bold]}${PURE[blue]}M${PURE[nc]}"}
 
   # redraw years
-  ut=${ut/ years/"${BOLD}${MAGENTA}Y${NC}"}
-  ut=${ut/ year/"${BOLD}${MAGENTA}Y${NC}"}
+  ut=${ut/ years/"${PURE[bold]}${PURE[magenta]}Y${PURE[nc]}"}
+  ut=${ut/ year/"${PURE[bold]}${PURE[magenta]}Y${PURE[nc]}"}
 
   printf "${BRA_LEFT}%s${BRA_RIGHT}" "${ut}"
 }
@@ -400,12 +423,12 @@ __setup_info_bar__() {
   local CWD USERCOLOR
 
   if [[ "$USER" == "root" ]]; then
-    USERCOLOR=${RED}${BOLD}
+    USERCOLOR=${PURE[red]}${PURE[bold]}
   else
-    USERCOLOR=${MAGENTA}
+    USERCOLOR=${PURE[magenta]}
   fi
 
-  user="${USERCOLOR}${USER}${NC}"
+  user="${USERCOLOR}${USER}${PURE[nc]}"
 
   # current working directory with $HOME replcaed with ~
   CWD=${PWD/"$HOME"/"~"}
@@ -413,12 +436,12 @@ __setup_info_bar__() {
   if $ENABLE_SSH; then
     # for ssh connections
     if [[ -n $SSH_CONNECTION ]]; then
-      user="${BOLD}${USERCOLOR}${USER}${RED}@${HOSTNAME}${NC}${CYAN}:${CWD}${NC}"
+      user="${PURE[bold]}${USERCOLOR}${USER}${PURE[red]}@${HOSTNAME}${PURE[nc]}${PURE[cyan]}:${CWD}${PURE[nc]}"
     else
-      user+="${CYAN}:${CWD}${NC}"
+      user+="${PURE[cyan]}:${CWD}${PURE[nc]}"
     fi
   else
-    user+="${CYAN}:${CWD}${NC}"
+    user+="${PURE[cyan]}:${CWD}${PURE[nc]}"
   fi
 
   MODULES=()
@@ -466,12 +489,12 @@ __update__vars() {
 
   # status color for the prompt symbol
   if ((err == 0)); then
-    STATUS=${MAGENTA}
+    STATUS=${PURE[magenta]}
   else
     if $ENABLE_ERROR_CODES; then
-      STATUS="${RED}(${err}) ${MAGENTA}"
+      STATUS="${PURE[red]}(${err}) ${PURE[magenta]}"
     else
-      STATUS="${RED}"
+      STATUS="${PURE[red]}"
     fi
   fi
 
@@ -480,10 +503,12 @@ __update__vars() {
   if $ENABLE_YAZI; then
     YAZI_TERM=""
     if [ -n "$YAZI_LEVEL" ]; then
-      YAZI_TERM="${BOLD}${RED} |  Yazi terminal:${NC} "
+      YAZI_TERM="${PURE[bold]}${PURE[red]} |  Yazi terminal:${PURE[nc]} "
     fi
   fi
 }
 
 PROMPT_COMMAND="__update__vars; ${PROMPT_COMMAND}"
 PS1="\n\${INFO_LINE}\${YAZI_TERM}\n${PROMPT_SYMBOL}"
+
+echo "${PURE[green]}Hey this is green!${PURE[nc]}" >&2
