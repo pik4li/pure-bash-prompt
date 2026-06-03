@@ -55,7 +55,8 @@ declare -Ag PURE=(
 case "$PURE_THEME" in
 tokyonight)
   PURE+=(
-    ["grey"]=$'\e[38;5;239m'
+    # ["grey"]=$'\e[38;5;239m'
+    ["grey"]=$'\e[38;2;92;92;92m'       # #5c5c5c (bg/darker)
     ["black"]=$'\e[38;2;7;11;20m'       # #070B14 (bg/darker)
     ["red"]=$'\e[38;2;255;85;119m'      # #FF5577 (red/pink)
     ["green"]=$'\e[38;2;99;191;132m'    # #63BF84 (green)
@@ -68,7 +69,8 @@ tokyonight)
   ;;
 gruvbox)
   PURE+=(
-    ["grey"]=$'\e[38;5;239m'
+    # ["grey"]=$'\e[38;5;239m'
+    ["grey"]=$'\e[38;2;146;131;116m'   # #928374
     ["black"]=$'\e[38;2;40;40;40m'     # #282828
     ["red"]=$'\e[38;2;204;36;29m'      # #CC241D
     ["green"]=$'\e[38;2;152;151;26m'   # #98971A
@@ -78,6 +80,19 @@ gruvbox)
     ["cyan"]=$'\e[38;2;104;157;106m'   # #688D6A
     ["white"]=$'\e[38;2;235;219;178m'  # #EBDBB2 (foreground/light)
   )                                    # the gruvbox colors
+  ;;
+8bit)
+  PURE+=(
+    ["grey"]=$'\e[38;2;92;92;92m'       # #5c5c5c (bg/darker)
+    ["black"]=$'\e[38;2;15;15;15m'      # #0f0f0f
+    ["red"]=$'\e[38;2;255;0;57m'        # #ff0039
+    ["green"]=$'\e[38;2;10;255;10m'     # #0aff0a
+    ["yellow"]=$'\e[38;2;255;255;73m'   # #ffff49
+    ["blue"]=$'\e[38;2;0;105;255m'      # #0069ff
+    ["magenta"]=$'\e[38;2;255;105;255m' # #ff69ff
+    ["cyan"]=$'\e[38;2;105;255;255m'    # #69ffff
+    ["white"]=$'\e[38;2;250;250;250m'   # #fafafa (foreground/light)
+  )                                     # the gruvbox colors
   ;;
 esac
 
