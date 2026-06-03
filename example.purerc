@@ -1,4 +1,6 @@
 # vim: ft=bash
+PURE_THEME="gruvbox"  # ["gruvbox", "tokyonight"]
+
 ENABLE_NERDFONTS=true # set to `false` if you do not have nerdfonts installed
 
 ENABLE_GIT=true       # set to `false` to disable GIT module
