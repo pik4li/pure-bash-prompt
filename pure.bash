@@ -4,13 +4,15 @@
 # ╰────────────╯
 
 # Bash only
+# shellcheck disable=SC2317
 if [ -z "${BASH_VERSION}" ]; then
-  echo "pure-clean.bash: requires bash" >&2
+  echo "pure.bash: requires bash" >&2
   return 1 2>/dev/null || exit 1
 fi
 
 PURE_CONFIG_FILE="${HOME}/.purerc"
 
+# shellcheck disable=SC1090
 [[ -e "${PURE_CONFIG_FILE}" ]] &&
   . "${PURE_CONFIG_FILE}"
 
@@ -44,6 +46,11 @@ declare -Ag PURE=(
   ["reset"]=$'\\[\e[0m\\]'
   ["nc"]=$'\\[\e[0m\\]'
 )
+
+case "$PURE_THEME" in
+tokyonight | gruvbox | 8bit | ayu) ;;
+*) PURE_THEME="ayu" ;;
+esac
 
 case "$PURE_THEME" in
 tokyonight)
